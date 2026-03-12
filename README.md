@@ -36,7 +36,7 @@
 2. Клонируйте репозиторий:
 
 ```bash
-git clone <repo-url>
+git clone [<repo-url>](https://github.com/vityazhyshy/vite-scss-starter.git
 cd vite-scss-starter
 ```
 
