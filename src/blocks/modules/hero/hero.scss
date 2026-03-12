@@ -1,0 +1,30 @@
+.hero {
+    padding: 4rem 0 5rem;
+}
+
+.hero__inner {
+    max-width: 56rem;
+}
+
+.hero__eyebrow {
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+}
+
+.hero__title {
+    margin: 0 0 1.5rem;
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1;
+}
+
+.hero__text {
+    max-width: 42rem;
+    margin: 0;
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+}

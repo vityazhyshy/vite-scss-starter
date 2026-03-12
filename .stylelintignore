@@ -1,1 +1,2 @@
-/src/styles/**/*.scss
+dist
+node_modules

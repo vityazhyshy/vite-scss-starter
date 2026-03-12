@@ -1,333 +1,466 @@
-# gulp-scss-starter
+# vite-scss-starter
 
-![License](https://img.shields.io/github/license/andreyalexeich/gulp-scss-starter)
-![GitHub stars](https://img.shields.io/github/stars/andreyalexeich/gulp-scss-starter.svg?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/andreyalexeich/gulp-scss-starter.svg?style=social)<br>
-<a href="https://t.me/andrewalexeich"><img src="https://img.shields.io/badge/Donate%20to%20me%20(Telegram%20TON)-UQC5GESVoOmFKJ8Khw8wwGIM3stCsnrXRHDcdfHvVjwR4ddL-blue?style=for-the-badge"></a>
+Современный frontend starter для многостраничных сайтов с привычным БЭМ-подходом, `@@include`-шаблонами и отдельными командами под типовые задачи.
 
-## :fire: Особенности
-* именование классов по [БЭМ](https://ru.bem.info/)
-* используется БЭМ-структура
-* используется препроцессор [SCSS](https://sass-lang.com/)
-* используется [gulp-format-html](https://www.npmjs.com/package/gulp-format-html)
-* используется транспайлер [Babel](https://babeljs.io/) для поддержки современного JavaScript (ES6) в браузерах
-* используется [Webpack](https://webpack.js.org/) для сборки JavaScript-модулей
-* используется жёсткий кодгайд
-* используется проверка кода на ошибки перед коммитом
+Сборщик переведён на современный стек, но концепция исходного проекта сохранена:
 
-## :hammer_and_wrench: Установка
-* установите [NodeJS](https://nodejs.org/en/) 18 версии через NVM
-* установите глобально:
-    * [Yarn](https://yarnpkg.com/getting-started): ```npm i -g yarn```
-    * [Gulp](https://gulpjs.com/): ```npm i -g gulp```
-    * [Bem Tools](https://www.npmjs.com/package/bem-tools-core): ```npm i -g bem-tools-core```
-* скачайте сборку с помощью [Git](https://git-scm.com/downloads): ```git clone https://github.com/vityazhyshy/gulp-scss-starter.git```
-* перейдите в скачанную папку со сборкой: ```cd gulp-scss-starter```
-* введите ```yarn set version berry```
-* скачайте необходимые зависимости: ```yarn```
-* чтобы начать работу, введите команду: ```yarn run dev``` (режим разработки)
-* чтобы собрать проект, введите команду ```yarn run build``` (режим сборки)
+- страницы лежат в `src/views`
+- БЭМ-блоки лежат в `src/blocks/modules` и `src/blocks/components`
+- HTML блоков подключается прямо в страницы через `@@include(...)`
+- SCSS блоков подключается через агрегаторы
+- JS блоков подключается через `src/js/import`
+- изображения, спрайты, WebP и favicon собираются отдельными командами
 
-Если вы всё сделали правильно, у вас должен открыться браузер с локальным сервером. Режим сборки предполагает оптимизацию проекта: сжатие изображений, минифицирование CSS и JS-файлов для загрузки на сервер.
+## Возможности
 
-## :open_file_folder: Файловая структура
+- БЭМ-структура проекта
+- SCSS + PostCSS + Autoprefixer
+- HTML partials через `@@include(...)`
+- многостраничная сборка
+- генерация SVG-спрайта
+- оптимизация изображений
+- генерация WebP
+- генерация favicon
+- генератор БЭМ-блоков и компонентов
+- генератор новых страниц
+- ESLint для JS
+- Stylelint для SCSS/CSS
+- Prettier для форматирования
+- проверки перед коммитом через Husky + lint-staged
+- smoke-тесты через Vitest
 
+## Установка
+
+1. Установите Node.js версии `18.20+`.
+   Рекомендуется использовать `nvm`.
+2. Клонируйте репозиторий:
+
+```bash
+git clone <repo-url>
+cd vite-scss-starter
 ```
-gulp-scss-starter
+
+3. Установите зависимости:
+
+```bash
+npm install
+```
+
+4. Запустите режим разработки:
+
+```bash
+npm run dev
+```
+
+5. Для production-сборки используйте:
+
+```bash
+npm run build
+```
+
+Если всё настроено правильно, локальный сервер будет доступен по адресу `http://127.0.0.1:5173/`.
+
+## Структура проекта
+
+```text
+vite-scss-starter
 ├── dist
-├── gulp-tasks
+├── public
+│   └── img
+├── scripts
 ├── src
-│   ├── blocks
-│   ├── fonts
-│   ├── img
-│   ├── js
-│   ├── styles
-│   ├── views
-│   └── .htaccess
-├── gulpfile.babel.js
-├── webpack.config.js
+│   ├── blocks
+│   │   ├── components
+│   │   ├── modules
+│   │   ├── _components.scss
+│   │   └── _modules.scss
+│   ├── fonts
+│   ├── img
+│   │   ├── favicon
+│   │   └── sprites
+│   ├── js
+│   │   ├── import
+│   │   └── index.js
+│   ├── styles
+│   ├── views
+│   │   ├── pages
+│   │   │   └── page.html
+│   │   ├── 404.html
+│   │   └── index.html
+├── eslint.config.mjs
+├── postcss.config.js
 ├── package.json
-├── .yarnrc.yml
-├── .babelrc.js
-├── .bemrc.js
-├── .eslintrc.json
-├── .stylelintrc
-├── .stylelintignore
-└── .gitignore
+└── vite.config.mjs
 ```
 
-* Корень папки:
-    * ```.babelrc.js``` — настройки Babel
-    * ```.bemrc.js``` — настройки БЭМ
-    * ```.eslintrc.json``` — настройки ESLint
-    * ```.gitignore``` – запрет на отслеживание файлов Git'ом
-    * ```.stylelintrc``` — настройки Stylelint
-    * ```.stylelintignore``` – запрет на отслеживание файлов Stylelint'ом
-    * ```.yarnrc.yml``` – настройка Yarn
-    * ```gulpfile.babel.js``` — настройки Gulp
-    * ```webpack.config.js``` — настройки Webpack
-    * ```package.json``` — список зависимостей
-* Папка ```src``` - используется во время разработки:
-    * БЭМ-блоки: ```src/blocks```
-    * шрифты: ```src/fonts```
-    * изображения: ```src/img```
-    * JS-файлы: ```src/js```
-    * страницы сайта: ```src/views/pages```
-    * SCSS-файлы: ```src/styles```
-    * HTML-файлы: ```src/views```
-    * конфигурационный файл веб-сервера Apache с настройками [gzip](https://habr.com/ru/post/221849/) (сжатие без потерь): ```src/.htaccess```
-* Папка ```dist``` - папка, из которой запускается локальный сервер для разработки (при запуске ```yarn run dev```)
-* Папка ```gulp-tasks``` - папка с Gulp-тасками
+## Основная идея
 
-## :keyboard: Команды
-* ```yarn run lint:styles``` - проверить SCSS-файлы. Для VSCode необходимо установить [плагин](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint). Для WebStorm
-или PHPStorm необходимо включить Stylelint в ```Languages & Frameworks - Style Sheets - Stylelint```
-* ```yarn run dev``` - запуск сервера для разработки проекта
-* ```yarn run build``` - собрать проект с оптимизацией без запуска сервера
-* ```yarn run build:views``` - собрать HTML-файлы
-* ```yarn run build:styles``` - скомпилировать SCSS-файлы
-* ```yarn run build:scripts``` - собрать JS-файлы
-* ```yarn run build:images``` - собрать изображения
-* ```yarn run build:webp``` - сконвертировать изображения в формат ```.webp```
-* ```yarn run build:sprites```- собрать спрайты
-* ```yarn run build:fonts``` - собрать шрифты
-* ```yarn run build:favicons``` - собрать фавиконки
-* ```yarn run build:gzip``` - собрать конфигурацию Apache
-* ```yarn run bem-m``` - добавить БЭМ-блок
-* ```yarn run lint:styles --fix``` - исправить ошибки в SCSS-файлах согласно настройкам Stylelint
-* ```yarn run lint:scripts``` - проверить JS-файлы
-* ```yarn run lint:scripts --fix``` - исправить ошибки в JS-файлах согласно настройкам ESLint
+### Страницы
 
-## :bulb: Рекомендации по использованию
-### Компонентный подход к разработке сайтов
-* каждый БЭМ-блок имеет свою папку внутри ```src/blocks/modules```
-* папка одного БЭМ-блока содержит в себе один HTML-файл, один SCSS-файл и один JS-файл (если у блока используется скрипт)
-    * HTML-файл блока импортируется в файл ```src/views/index.html``` (или в необходимый файл страницы, откуда будет вызываться блок)
-    * SCSS-файл блока импортируется в файл ```src/blocks/modules/_modules.scss```
-    * JS-файл блока импортируется в ```src/js/import/modules.js```
+- Все рабочие страницы лежат в `src/views`.
+- Главная страница: `src/views/index.html`
+- Страница 404: `src/views/404.html`
+- Шаблон новой страницы: `src/views/pages/page.html`
 
-Пример структуры папки с БЭМ-блоком:
-```
-blocks
-├── modules
-│   ├──header
-│   │   ├── header.html
-│   │   ├── header.js
-│   │   ├── header.scss
+Важно:
+
+- `src/views/pages/page.html` не является отдельной страницей сайта.
+- Это шаблон, который используется командой `new:page`.
+
+### Блоки
+
+- Каждый БЭМ-блок лежит в своей папке внутри `src/blocks/modules`.
+- Каждый компонент лежит в `src/blocks/components`.
+- У блока могут быть:
+    - HTML-файл
+    - SCSS-файл
+    - JS-файл
+
+Пример структуры блока:
+
+```text
+src/blocks/modules/hero
+├── hero.html
+├── hero.scss
+└── hero.js
 ```
 
-Чтобы вручную не создавать соответствующие папку и файлы, достаточно в консоли прописать следующую команду: ```yarn run bem-m my-block``` - для создания БЭМ-блока в ```src/block/modules```, где ```my-block``` - имя БЭМ-блока (после создания нужно удалить содержимое js-файла БЭМ-блока).
+Если JS для блока не нужен, файл можно удалить и не импортировать.
 
-### Страницы проекта
-* страницы проекта находятся в папке ```src/views/pages```
-    * главная страница: ```src/views/index.html```
+### Подключение блока
 
-### Шрифты
-* шрифты находятся в папке ```src/fonts```
-    * используйте [форматы](https://caniuse.com/#search=woff) ```.woff``` и ```.woff2```
-    * шрифты подключаются в файл ```src/styles/base/_fonts.scss```
-    * сконвертировать локальные шрифты можно с помощью [данного сервиса](https://onlinefontconverter.com/)
+HTML блока подключается прямо в страницу:
 
-### Изображения
-* изображения находятся в папке ```src/img```
-    * изображения автоматически конвертируются в формат ```.webp```. Подробная информация по использованию [тут](https://vk.com/@vk_it-webp)
-    * изображение для генерации фавиконок должно находиться в папке ```src/img/favicon``` и иметь размер не менее ```1024px x 1024px```
+```html
+@@include('../blocks/modules/hero/hero.html')
+```
 
-### SVG-спрайты
-Для создания спрайтов изображения ```.svg``` должны находиться в папке ```src/img/sprites```. Например, у нас есть файлы ```icon-1.svg```, ```icon-2.svg``` и ```icon-3.svg```, и мы должны обратиться к ```icon-2.svg```. Для этого в HTML нужно воспользоваться тегом ```<use>```:
+SCSS блока подключается в:
+
+```text
+src/blocks/_modules.scss
+```
+
+JS блока подключается в:
+
+```text
+src/js/import/modules.js
+```
+
+Именно такой поток и является основным для этого starter.
+
+## Команды
+
+### Основные
+
+- `npm run dev` — запуск dev-сервера
+- `npm run build` — production-сборка
+- `npm run preview` — просмотр production-сборки
+
+### Генерация блоков и страниц
+
+- `npm run bem-m -- hero` — создать модуль `hero`
+- `npm run bem-c -- button` — создать компонент `button`
+- `npm run block -- --type=module hero` — то же самое, явный вариант
+- `npm run block -- --type=module --page=index hero` — создать блок и сразу подключить его в `src/views/index.html`
+- `npm run new:page -- about` — создать новую страницу `src/views/about.html` по шаблону
+- `npm run new:page -- company-services` — создать страницу `company-services.html`
+
+### Изображения и ассеты
+
+- `npm run assets:prepare` — прогнать весь asset pipeline
+- `npm run assets:sprites` — собрать SVG-спрайт
+- `npm run assets:images` — оптимизировать изображения
+- `npm run assets:webp` — сгенерировать WebP
+- `npm run assets:favicons` — сгенерировать favicon
+
+### Совместимые алиасы
+
+- `npm run build:sprites`
+- `npm run build:images`
+- `npm run build:webp`
+- `npm run build:favicons`
+
+### Линтинг и форматирование
+
+- `npm run lint` — проверить JS и стили
+- `npm run lint:js` — проверить JS
+- `npm run lint:scripts` — алиас для проверки JS
+- `npm run lint:styles` — проверить стили
+- `npm run lint:fix` — исправить доступные проблемы автоматически
+- `npm run lint:scripts:fix` — исправить JS
+- `npm run lint:styles:fix` — исправить стили
+- `npm run format` — форматировать проект через Prettier
+- `npm run format:check` — проверить форматирование
+- `npm run test` — запустить smoke-тесты
+
+## Как создавать новую страницу
+
+1. Выполните команду:
+
+```bash
+npm run new:page -- about
+```
+
+2. Сборщик создаст файл:
+
+```text
+src/views/about.html
+```
+
+3. Откройте страницу и заполните `<main>`:
+
+```html
+<main class="main" role="main">@@include('../blocks/modules/hero/hero.html')</main>
+```
+
+4. Если нужен новый блок для этой страницы, создайте его:
+
+```bash
+npm run block -- --type=module --page=about about-hero
+```
+
+Эта команда:
+
+- создаст папку блока
+- создаст HTML, SCSS и JS файлы блока
+- добавит SCSS блока в `src/blocks/_modules.scss`
+- добавит JS блока в `src/js/import/modules.js`
+- вставит `@@include(...)` блока в `src/views/about.html`
+
+## Как создавать новый БЭМ-блок
+
+Пример:
+
+```bash
+npm run bem-m -- promo
+```
+
+Будет создано:
+
+```text
+src/blocks/modules/promo
+├── promo.html
+├── promo.scss
+└── promo.js
+```
+
+После этого автоматически обновятся:
+
+- `src/blocks/_modules.scss`
+- `src/js/import/modules.js`
+
+Если указать `--page`, блок также автоматически подключится в нужную страницу.
+
+Пример:
+
+```bash
+npm run block -- --type=module --page=index promo
+```
+
+## Как создавать новый компонент
+
+Пример:
+
+```bash
+npm run bem-c -- button
+```
+
+Будет создано:
+
+```text
+src/blocks/components/button
+├── button.html
+├── button.scss
+└── button.js
+```
+
+После этого автоматически обновятся:
+
+- `src/blocks/_components.scss`
+- `src/js/import/components.js`
+
+## HTML partials
+
+В проекте используется синтаксис:
+
+```html
+@@include('../blocks/modules/header/header.html')
+```
+
+Также можно передавать параметры:
+
+```html
+@@include('../blocks/modules/head/head.html', { "title": "Главная" })
+```
+
+Этот подход сохранён специально, чтобы работа со страницами и блоками оставалась такой же прямой и понятной, как в исходном starter.
+
+## Изображения
+
+Исходные изображения лежат в:
+
+```text
+src/img
+```
+
+Сгенерированные файлы попадают в:
+
+```text
+public/img
+```
+
+А затем копируются в `dist` при сборке.
+
+### WebP
+
+Чтобы собрать WebP:
+
+```bash
+npm run assets:webp
+```
+
+### Оптимизация изображений
+
+Чтобы оптимизировать изображения:
+
+```bash
+npm run assets:images
+```
+
+## SVG-спрайты
+
+SVG-иконки для спрайта должны лежать в:
+
+```text
+src/img/sprites
+```
+
+Сборка спрайта:
+
+```bash
+npm run assets:sprites
+```
+
+Результат:
+
+```text
+public/img/sprites/sprite.svg
+```
+
+Использование в HTML:
+
 ```html
 <svg>
-    <use xlink:href="img/sprites/sprite.svg#icon-2"></use>
+    <use xlink:href="/img/sprites/sprite.svg#icon-name"></use>
 </svg>
 ```
-Изменить стили svg-иконки из спрайта в CSS:
-```css
-svg use {
-    fill: red;
-}
-```
-Бывает такая ситуация, когда стили иконки поменять не получается. Это связано с тем, что при экспорте из Figma в svg добавляется лишний код. Например:
-```html
-<svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M4.90918 4.04542L13.091 9.54088L4.90918 14.9545L4.90918 4.04542Z" fill="#1B1B1D"/>
-</svg>
-```
-Нужно удалить ```fill="none"``` и ```fill="#1B1B1D"```. Должно получиться так:
-```html
-<svg width="18" height="19" viewBox="0 0 18 19" xmlns="http://www.w3.org/2000/svg">
-  <path d="M4.90918 4.04542L13.091 9.54088L4.90918 14.9545L4.90918 4.04542Z"/>
-</svg> 
-```
-Также иконки желательно прогнать через сайт [SVGOMG](https://jakearchibald.github.io/svgomg/)
-### SCSS файлы
 
-Контрольные точки (Breakpoints):
+Рекомендация:
 
-| Breakpoint              | Class infix | Dimensions |
-| ----------------------- | ----------- | ---------- |
-| Extra small             | None        | <480px     |
-| Small                   | `sm`        | ≥480px     |
-| Medium                  | `md`        | ≥768px     |
-| Large                   | `lg`        | ≥992px     |
-| Extra large             | `xl`        | ≥1280px    |
-| Extra extra large       | `xxl`       | ≥1536px    |
-| Extra extra extra large | `xxxl`      | ≥1920px    |
+- перед использованием очищайте SVG от лишних `fill`, `stroke` и инлайновых стилей, если хотите управлять цветом из CSS
 
-Эти точки можно настроить в файле `src/styles/base/helpers/_mixins.scss`
+## Favicons
 
-<a id="minWidth" name="minWidth"></a>
+Исходный файл favicon должен лежать в:
 
-#### Min-width
-
-```scss
-// Для точки останова xs не требуется медиа-запрос, поскольку он фактически `@media (min-width: 0) { ... }`
-@include media-breakpoint-up(sm) { ... }
-@include media-breakpoint-up(md) { ... }
-@include media-breakpoint-up(lg) { ... }
-@include media-breakpoint-up(xl) { ... }
-@include media-breakpoint-up(xxl) { ... }
-
-// Применение
-
-// Пример: скрыть, начиная с `min-width: 0`, а затем показать в точке останова `sm`
-.custom-class {
-  display: none;
-}
-@include media-breakpoint-up(sm) {
-  .custom-class {
-    display: block;
-  }
-}
+```text
+src/img/favicon/favicon.png
 ```
 
-Эти миксины Sass транслируются в наш скомпилированный CSS с использованием значений, объявленных в
-наших переменных Sass. Например:
+Рекомендуемый размер:
 
-```scss
-@media (min-width: 480px) {
-  ...
-}
+- не меньше `1024x1024`
 
-@media (min-width: 768px) {
-  ...
-}
+Команда генерации:
 
-@media (min-width: 992px) {
-  ...
-}
-
-@media (min-width: 1280px) {
-  ...
-}
-
-@media (min-width: 1536px) {
-  ...
-}
+```bash
+npm run assets:favicons
 ```
 
-<br>
+Результат:
 
-<a id="maxWidth" name="maxWidth"></a>
-
-#### Max-width
-
-```scss
-// Для точки останова xs не требуется медиа-запрос, поскольку он фактически `@media (min-width: 0) { ... }`
-@include media-breakpoint-down(sm) { ... }
-@include media-breakpoint-down(md) { ... }
-@include media-breakpoint-down(lg) { ... }
-@include media-breakpoint-down(xl) { ... }
-@include media-breakpoint-down(xxl) { ... }
-
-// Применение
-
-// Пример: Стиль от средней точки останова и вниз
-@include media-breakpoint-down(md) {
-  .custom-class {
-    display: block;
-  }
-}
+```text
+public/img/favicons
 ```
 
-Эти миксины Sass транслируются в наш скомпилированный CSS с использованием значений, объявленных в
-наших переменных Sass. Например:
+## Шрифты
 
-```scss
-@media (max-width: 479.98px) {
-  ...
-}
+Шрифты хранятся в:
 
-@media (max-width: 767.98px) {
-  ...
-}
-
-@media (max-width: 991.98px) {
-  ...
-}
-
-@media (max-width: 1279.98px) {
-  ...
-}
-
-@media (max-width: 1535.98px) {
-  ...
-}
+```text
+src/fonts
 ```
 
-<br>
+Подключение шрифтов выполняется в:
 
-<a id="betweenBreakpoints" name="betweenBreakpoints"></a>
-
-#### Between breakpoints
-
-Точно так же медиа-запросы могут охватывать несколько точек останова по ширине:
-
-```scss
-@include media-breakpoint-between(md, xl) {
-  ...
-}
+```text
+src/styles/base/_fonts.scss
 ```
 
-Что приводит к:
+Рекомендуется использовать форматы:
 
-```scss
-@media (min-width: 768px) and (max-width: 1279.98px) {
-  ...
-}
+- `.woff`
+- `.woff2`
+
+## Стили
+
+Главный SCSS-файл:
+
+```text
+src/styles/main.scss
 ```
 
-<a id="templateEngine" name="templateEngine"></a>
+Токены вынесены в CSS custom properties через `:root`:
 
-## Шаблонизатор _gulp-file-include_
+```text
+src/styles/helpers/_variables.scss
+```
 
-В проекте присутствует шаблонизатор, который помогает соединять несколько html файлов в один
-через `@@include` и другое.
-Подробнее [здесь](https://github.com/haoxins/gulp-file-include/blob/main/Readme.md).
+SCSS-миксины и функции лежат в:
 
-<a id="libraries" name="libraries"></a>
-### Сторонние библиотеки
-* все сторонние библиотеки устанавливаются в папку ```node_modules```
-    * для их загрузки воспользуйтеcь командой ```yarn add package_name``` (например, ```yarn add jquery```)
-    * для подключения JS-файлов библиотек импортируйте их в самом начале JS-файла БЭМ-блока (то есть тот БЭМ-блок, который использует скрипт), например:
-    ```javascript
-    import $ from "jquery";
-    ```
-    пример подключения Bootstrap и встроенного инструмента Tooltip:
-    ```javascript
-    import bootstrap from "bootstrap/dist/js/bootstrap.bundle";
-    
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-    ```
-    
-    * для подключения стилевых файлов библиотек импортируйте их в файл ```src/styles/vendor/_libs.scss```
-    * JS-файлы и стилевые файлы библиотек самостоятельно изменять нельзя
+```text
+src/styles/helpers
+```
 
-## :point_right: Нужен SCSS + Pug?
-Используйте [эту](https://github.com/andrewalexeich/gulp-pug-starter/) сборку.
+## Линтинг, форматирование и проверки перед коммитом
 
-## :yellow_heart: Нравится проект?
-Сообщайте мне о [багах](https://github.com/andrewalexeich/gulp-scss-starter/issues), ставьте звёздочку, [задонатьте](https://t.me/andrewalexeich) мне Telegram TON на пиво :beer:
+В проекте используются:
 
-## :envelope: Контакты
-По всем вопросам пишите в [Telegram](https://t.me/andrewalexeich)
+- ESLint
+- Stylelint
+- Prettier
+- Husky
+- lint-staged
+
+Перед коммитом автоматически запускаются:
+
+- линтинг изменённых файлов
+- форматирование изменённых файлов
+- `npm run test`
+
+Это позволяет держать проект в чистом состоянии без ручной рутины.
+
+## Рекомендованный сценарий работы
+
+1. Запустить `npm run dev`
+2. Создать страницу через `npm run new:page -- page-name`
+3. Создать нужные блоки через `npm run bem-m -- block-name`
+4. Подключать блоки в страницу через `@@include(...)`
+5. Складывать изображения в `src/img`
+6. При необходимости запускать `assets:*` команды
+7. Перед коммитом прогонять:
+
+```bash
+npm run lint
+npm run format:check
+npm run test
+```
+
+## Что важно знать
+
+- В исходниках страницы лежат в `src/views`, а не в корне проекта.
+- В `dist` HTML-файлы складываются в корень сборки.
+- `src/views/pages/page.html` нужен как шаблон для новых страниц.
+- Лишние demo-layout файлы и промежуточные partial pages из проекта убраны.
+- Starter ориентирован на быстрый запуск типовых многостраничных сайтов, а не на SPA-архитектуру.

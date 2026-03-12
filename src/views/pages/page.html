@@ -1,30 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
     <head>
-        @@include('../../blocks/modules/head/head.html', {
-            "title": "Заголовок страницы",
-            "layout": "page"
-        })
+        @@include('__BLOCKS_PATH__/modules/head/head.html', { "title": "@@title" })
     </head>
     <body>
         <div class="wrapper">
-            @@include('../../blocks/modules/header/header.html', {
-                "title": "Заголовок страницы",
-                "layout": "page"
-            })
+            @@include('__BLOCKS_PATH__/modules/header/header.html', { "currentPage-home": "",
+            "currentPage-404": "" })
 
             <main class="main" role="main">
-                
                 <!-- Content here -->
-
             </main>
 
-            @@include('../../blocks/modules/footer/footer.html', {
-                "title": "Заголовок страницы",
-                "layout": "page"
-            })
+            @@include('__BLOCKS_PATH__/modules/footer/footer.html')
         </div>
-        
-        @@include('../../blocks/modules/js/js.html')
+
+        @@include('__BLOCKS_PATH__/modules/js/js.html')
     </body>
 </html>

@@ -1,30 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
     <head>
-        @@include('../blocks/modules/head/head.html', {
-            "title": "Главная",
-            "layout": "home"
-        })
+        @@include('../blocks/modules/head/head.html', { "title": "Главная" })
     </head>
     <body>
         <div class="wrapper">
-            @@include('../blocks/modules/header/header.html', {
-                "title": "Главная",
-                "layout": "home"
-            })
+            @@include('../blocks/modules/header/header.html', { "currentPage-home":
+            "aria-current=\"page\"", "currentPage-404": "" })
 
-            <main class="main" role="main">
-                
-                <!-- Content here -->
+            <main class="main" role="main">@@include('../blocks/modules/hero/hero.html')</main>
 
-            </main>
-
-            @@include('../blocks/modules/footer/footer.html', {
-                "title": "Главная",
-                "layout": "home"
-            })
+            @@include('../blocks/modules/footer/footer.html')
         </div>
-        
+
         @@include('../blocks/modules/js/js.html')
     </body>
 </html>

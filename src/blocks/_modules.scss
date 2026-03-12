@@ -1,2 +1,4 @@
-@import "modules/header/header";
-@import "modules/footer/footer";
+@use "modules/header/header";
+@use "modules/footer/footer";
+@use "modules/hero/hero";
+@use "modules/not-found/not-found";

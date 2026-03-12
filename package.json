@@ -1,101 +1,80 @@
 {
-    "name": "gulp-scss-starter",
-    "description": "Frontend development with pleasure",
+    "name": "vite-scss-starter",
+    "version": "2.0.0",
+    "private": true,
+    "description": "Modern multipage frontend starter powered by Vite and Sass",
     "author": "Andrey Gorokhov",
     "license": "GPL-3.0-only",
     "repository": {
         "type": "git",
-        "url": "https://github.com/andreyalexeich/gulp-scss-starter.git"
+        "url": "https://github.com/vityazhyshy/vite-scss-starter.git"
     },
-
     "scripts": {
-        "dev": "gulp",
-        "build": "gulp prod --production",
-        "build:views": "gulp views --production",
-        "build:styles": "gulp styles --production",
-        "build:scripts": "gulp scripts --production",
-        "build:images": "gulp images --production",
-        "build:webp": "gulp webp --production",
-        "build:sprites": "gulp sprites --production",
-        "build:fonts": "gulp fonts --production",
-        "build:favicons": "gulp favicons --production",
-        "build:gzip": "gulp gzip --production",
-        "lint:styles": "stylelint \"src/**/*.scss\"",
-        "lint:styles --fix": "stylelint --fix \"src/**/*.scss\"",
-        "lint:scripts": "eslint \"src/js/**/*.js\"",
-        "lint:scripts --fix": "eslint --fix \"src/js/**/*.js\"",
-        "bem-c": "bem create $* -l src/blocks/components",
-        "bem-m": "bem create $* -l src/blocks/modules"
+        "dev": "vite --host 127.0.0.1",
+        "build": "vite build",
+        "preview": "vite preview --host 127.0.0.1",
+        "assets:prepare": "node ./scripts/assets.mjs prepare",
+        "assets:sprites": "node ./scripts/assets.mjs sprites",
+        "assets:images": "node ./scripts/assets.mjs images",
+        "assets:webp": "node ./scripts/assets.mjs webp",
+        "assets:favicons": "node ./scripts/assets.mjs favicons",
+        "build:sprites": "npm run assets:sprites",
+        "build:images": "npm run assets:images",
+        "build:webp": "npm run assets:webp",
+        "build:favicons": "npm run assets:favicons",
+        "block": "node ./scripts/generate-block.mjs",
+        "block:module": "node ./scripts/generate-block.mjs --type=module",
+        "block:component": "node ./scripts/generate-block.mjs --type=component",
+        "bem-m": "node ./scripts/generate-block.mjs --type=module",
+        "bem-c": "node ./scripts/generate-block.mjs --type=component",
+        "new:page": "node ./scripts/generate-page.mjs",
+        "lint": "npm run lint:js && npm run lint:styles",
+        "lint:fix": "npm run lint:js -- --fix && npm run lint:styles -- --fix",
+        "lint:js": "eslint .",
+        "lint:scripts": "npm run lint:js",
+        "lint:scripts:fix": "npm run lint:js -- --fix",
+        "lint:styles": "stylelint \"src/**/*.{scss,css}\"",
+        "lint:styles:fix": "npm run lint:styles -- --fix",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "prepare": "husky"
     },
-
-    "devDependencies": {
-        "@babel/core": "^7.17.5",
-        "@babel/preset-env": "^7.16.11",
-        "@babel/register": "^7.17.0",
-        "@babel/eslint-parser": "^7.17.0",
-        "babel-loader": "^8.2.3",
-        "eslint": "^8.11.0",
-        "bem-tools-core": "bem-tools/bem-tools-core",
-        "bem-tools-create": "bem-tools/bem-tools-create",
-        "browser-sync": "^2.27.7",
-        "del": "^6.0.0",
-        "gulp": "^4.0.2",
-        "gulp-autoprefixer": "^8.0.0",
-        "gulp-clean-css": "^4.3.0",
-        "gulp-debug": "^4.0.0",
-        "gulp-favicons": "^3.0.0",
-        "gulp-file-include": "^2.3.0",
-        "gulp-format-html": "^2.2.0",
-        "gulp-group-css-media-queries": "^1.2.2",
-        "gulp-if": "^3.0.0",
-        "gulp-imagemin": "^7.1.0",
-        "gulp-newer": "^1.4.0",
-        "gulp-plumber": "^1.2.1",
-        "gulp-rename": "^2.0.0",
-        "gulp-replace": "^1.1.3",
-        "gulp-sass": "^5.1.0",
-        "gulp-sourcemaps": "^3.0.0",
-        "gulp-svg-sprite": "^1.5.0",
-        "gulp-watch": "^5.0.1",
-        "gulp-webp": "^4.0.1",
-        "husky": "^7.0.4",
-        "imagemin-giflossy": "^5.1.10",
-        "imagemin-jpeg-recompress": "^7.0.0",
-        "imagemin-mozjpeg": "^9.0.0",
-        "imagemin-pngquant": "^9.0.0",
-        "imagemin-webp": "^6.0.0",
-        "imagemin-zopfli": "^7.0.0",
-        "lint-staged": "^12.3.5",
-        "postcss": "^8.4.8",
-        "postcss-scss": "^4.0.3",
-        "require-dir": "^1.2.0",
-        "sass": "^1.49.9",
-        "stylelint": "^14.5.3",
-        "stylelint-config-standard-scss": "^3.0.0",
-        "stylelint-order": "^5.0.0",
-        "stylelint-selector-bem-pattern": "^2.1.1",
-        "yargs": "^17.3.1"
-    },
-
-    "dependencies": {
-        "dev": "^0.1.3",
-        "webpack": "^5.70.0",
-        "webpack-stream": "^7.0.0"
-    },
-
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
-
     "lint-staged": {
-        "*.scss": [
-            "stylelint --fix --allow-empty-input"
-        ],
-
-        "*.js": [
+        "*.{js,mjs}": [
             "eslint --fix"
+        ],
+        "*.{scss,css}": [
+            "stylelint --fix"
+        ],
+        "*.{html,json,md}": [
+            "prettier --write"
         ]
+    },
+    "engines": {
+        "node": ">=18.20.0"
+    },
+    "packageManager": "npm@10.7.0",
+    "devDependencies": {
+        "@eslint/js": "^9.39.4",
+        "autoprefixer": "^10.4.21",
+        "eslint": "^9.39.4",
+        "eslint-config-prettier": "^10.1.8",
+        "fast-glob": "^3.3.3",
+        "favicons": "^7.2.0",
+        "globals": "^15.15.0",
+        "husky": "^9.1.7",
+        "lint-staged": "^15.5.2",
+        "postcss": "^8.5.8",
+        "prettier": "^3.6.2",
+        "sass": "^1.98.0",
+        "sharp": "^0.34.4",
+        "stylelint": "^16.26.1",
+        "stylelint-config-standard-scss": "^13.1.0",
+        "svg-sprite": "^2.0.4",
+        "svgo": "^4.0.0",
+        "vite": "^5.4.21",
+        "vitest": "^2.1.9"
     }
 }
