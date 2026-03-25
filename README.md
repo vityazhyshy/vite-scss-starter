@@ -87,7 +87,7 @@ npm run build
 Давайте создадим вашу первую страницу с новым блоком, чтобы понять, как всё работает:
 
 1. **Запустите проект:**
-   Откройте терминал в папке проекта и введите: `npm run dev`. 
+   Откройте терминал в папке проекта и введите: `npm run dev`.
    Перейдите в браузере по ссылке `http://localhost:5173`. Вы увидите стартовую страницу. Не закрывайте этот терминал!
 2. **Создайте новую страницу:**
    Откройте **новую** вкладку терминала (в этой же папке) и введите:
@@ -121,7 +121,7 @@ vite-scss-starter
 │   │   └── sprites
 │   ├── js
 │   │   ├── import
-│   │   └── index.js
+│   │   └── main.js
 │   ├── styles
 │   ├── views
 │   │   ├── pages
@@ -143,6 +143,7 @@ vite-scss-starter
 ## 📖 Словарь терминов сборки
 
 В сборке используется БЭМ-подход. Ваши блоки делятся на две папки:
+
 - **Модули (`src/blocks/modules`)** — это крупные, самостоятельные части страницы (Шапка, Подвал, Секция со слайдером, Блок с тарифами).
 - **Компоненты (`src/blocks/components`)** — это мелкие элементы, которые могут переиспользоваться внутри модулей (Кнопка, Поле ввода, Декоративная иконка).
 - **`@@include`** — это специальная команда, которая говорит сборщику: "Возьми кусок HTML-кода из другого файла и вставь его сюда". Это позволяет, например, не копировать один и тот же код шапки на 10 разных страниц, а подключить его одной строчкой.
@@ -208,7 +209,8 @@ src/js/import/modules.js
 ### Основные
 
 - `npm run dev` — запуск dev-сервера
-- `npm run build` — production-сборка
+- `npm run build` — production-сборка (файлы с хэшем)
+- `npm run build:no-hash` — production-сборка (файлы без хэша: `main.min.js`, `vendor.min.js`, `main.min.css`)
 - `npm run preview` — просмотр production-сборки
 
 ### Генерация блоков и страниц
@@ -336,7 +338,7 @@ src/blocks/components/button
 
 ## 🌿 Здоровый БЭМ: Как писать классы?
 
-В этом стартере мы используем **современный, облегченный БЭМ**. Нам не нужны строгие правила из 2015 года, которые заставляют писать тонны кода. 
+В этом стартере мы используем **современный, облегченный БЭМ**. Нам не нужны строгие правила из 2015 года, которые заставляют писать тонны кода.
 
 Вот 3 простых правила, чтобы ваша верстка не ломалась:
 
@@ -349,11 +351,14 @@ src/blocks/components/button
 Если кнопка стала активной или меню открылось, не пишите длинные модификаторы вроде `menu__link--active`. Используйте простые, глобальные стейт-классы для изменения состояния через JS.
 ✅ `menu__link is-active`
 ✅ `popup is-open`
+
 ```scss
 // Как это стилизовать:
 .menu__link {
     color: black;
-    &.is-active { color: red; } 
+    &.is-active {
+        color: red;
+    }
 }
 ```
 
@@ -506,72 +511,80 @@ src/styles/helpers
 
 ## 📦 Как подключать сторонние библиотеки (Swiper, GSAP, Bootstrap)
 
-Современная сборка подразумевает, что вы **не скачиваете** архивы с библиотеками вручную и не кидаете их в папку проекта. Вы устанавливаете их через терминал (npm). 
+Современная сборка подразумевает, что вы **не скачиваете** архивы с библиотеками вручную и не кидаете их в папку проекта. Вы устанавливаете их через терминал (npm).
 
 ### Сценарий 1: Локальное подключение библиотеки (Правильный путь)
+
 Идеальный вариант для Vite-сборок. Код библиотеки попадает только туда, где он реально нужен, не утяжеляя остальной сайт.
 
 1. **Установите нужный пакет.** Откройте терминал в корне проекта и напишите:
-   ```bash
-   npm install swiper
-   ```
+    ```bash
+    npm install swiper
+    ```
 2. **Импортируйте библиотеку в нужном блоке.** Например, в `src/blocks/modules/hero/hero.js`:
-   ```javascript
-   // Подключаем JS
-   import Swiper from 'swiper';
-   import { Navigation, Pagination } from 'swiper/modules';
-   
-   // Подключаем CSS (Vite сам разберется, что это стили)
-   import 'swiper/css';
-   import 'swiper/css/navigation';
-   import 'swiper/css/pagination';
 
-   // Инициализируем 
-   const swiper = new Swiper('.hero__slider', {
-       modules: [Navigation, Pagination],
-       loop: true
-   });
-   ```
+    ```javascript
+    // Подключаем JS
+    import Swiper from "swiper";
+    import { Navigation, Pagination } from "swiper/modules";
+
+    // Подключаем CSS (Vite сам разберется, что это стили)
+    import "swiper/css";
+    import "swiper/css/navigation";
+    import "swiper/css/pagination";
+
+    // Инициализируем
+    const swiper = new Swiper(".hero__slider", {
+        modules: [Navigation, Pagination],
+        loop: true
+    });
+    ```
 
 ### Сценарий 2: Глобальное подключение (Если библиотека нужна везде)
+
 Если вы используете GSAP для анимаций по всему сайту на каждой странице, или Bootstrap сетку.
+
 1. Установите библиотеку: `npm install gsap`
-2. Откройте `src/js/index.js` (главный входной файл JS) и подключите там:
-   ```javascript
-   import { gsap } from "gsap";
-   import { ScrollTrigger } from "gsap/ScrollTrigger";
-   
-   gsap.registerPlugin(ScrollTrigger);
-   
-   // Теперь вы можете использовать gsap в любых js-файлах своих блоков!
-   ```
+2. Откройте `src/js/main.js` (главный входной файл JS) и подключите там:
+
+    ```javascript
+    import { gsap } from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Теперь вы можете использовать gsap в любых js-файлах своих блоков!
+    ```
 
 ### Сценарий 3: "Мне нужен доступ к библиотекам после натяжки на CMS"
+
 Иногда бывает так, что вы отдаете верстку бэкендеру, он натягивает её на WordPress/Битрикс, и там нужно "дописать" инициализацию слайдера прямо в `<script>` на странице, а исходников сборки уже нет (только собранный `dist`).
 
 По умолчанию Vite прячет весь ваш JS внутрь модулей, и переменная `Swiper` не видна в консоли разработчика. Чтобы починить это, нужно "вытащить" библиотеку в глобальную область видимости (сделать её доступной из объекта `window`).
 
 1. Установите библиотеку: `npm install swiper`
-2. В файле `src/js/index.js` привяжите библиотеку к `window`:
-   ```javascript
-   import Swiper from 'swiper';
-   import { Navigation, Pagination } from 'swiper/modules';
-   import 'swiper/css/bundle'; // подключаем все стили сразу, если не знаем, какие понадобятся в будущем
-   
-   // Делаем Swiper глобальным!
-   window.Swiper = Swiper;
-   window.Navigation = Navigation;
-   window.Pagination = Pagination;
-   ```
+2. В файле `src/js/main.js` привяжите библиотеку к `window`:
+
+    ```javascript
+    import Swiper from "swiper";
+    import { Navigation, Pagination } from "swiper/modules";
+    import "swiper/css/bundle"; // подключаем все стили сразу, если не знаем, какие понадобятся в будущем
+
+    // Делаем Swiper глобальным!
+    window.Swiper = Swiper;
+    window.Navigation = Navigation;
+    window.Pagination = Pagination;
+    ```
+
 3. Теперь, даже на собранном сайте без исходников, любой программист (или вы сами) сможете написать в HTML:
-   ```html
-   <script>
-       // Сработает, потому что Swiper глобальный
-       const mySlider = new Swiper('.slider', {
-           modules: [Navigation, Pagination]
-       });
-   </script>
-   ```
+    ```html
+    <script>
+        // Сработает, потому что Swiper глобальный
+        const mySlider = new Swiper(".slider", {
+            modules: [Navigation, Pagination]
+        });
+    </script>
+    ```
 
 ## 🛡️ Линтинг, форматирование и проверки перед коммитом
 

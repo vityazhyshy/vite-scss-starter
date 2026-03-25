@@ -198,7 +198,31 @@ export default defineConfig(({ mode }) => ({
         outDir: "dist",
         emptyOutDir: true,
         rollupOptions: {
-            input: htmlEntries
+            input: htmlEntries,
+            output: {
+                entryFileNames: () => {
+                    const noHash = process.env.NO_HASH === 'true';
+                    return noHash ? 'assets/js/[name].min.js' : 'assets/js/[name]-[hash].min.js';
+                },
+                chunkFileNames: () => {
+                    const noHash = process.env.NO_HASH === 'true';
+                    return noHash ? 'assets/js/[name].min.js' : 'assets/js/[name]-[hash].min.js';
+                },
+                assetFileNames: (assetInfo) => {
+                    const noHash = process.env.NO_HASH === 'true';
+                    const fileName = assetInfo.names?.[0] || assetInfo.name || '';
+                    const extType = fileName.split('.').pop();
+                    if (extType === 'css') {
+                        return noHash ? 'assets/styles/main.min.css' : 'assets/styles/main-[hash].min.css';
+                    }
+                    return noHash ? `assets/${extType}/[name].[ext]` : `assets/${extType}/[name]-[hash].[ext]`;
+                },
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        return 'vendor';
+                    }
+                }
+            }
         }
     }
 }));

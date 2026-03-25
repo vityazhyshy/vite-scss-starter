@@ -8,7 +8,7 @@ describe("project scaffold", () => {
         expect(existsSync(resolve("src/views/404.html"))).toBe(true);
         expect(existsSync(resolve("src/views/pages/page.html"))).toBe(true);
         expect(existsSync(resolve("src/blocks/modules/hero/hero.html"))).toBe(true);
-        expect(existsSync(resolve("src/js/index.js"))).toBe(true);
+        expect(existsSync(resolve("src/js/main.js"))).toBe(true);
         expect(existsSync(resolve("src/styles/main.scss"))).toBe(true);
     });
 });

@@ -12,6 +12,7 @@
     "scripts": {
         "dev": "vite --host 127.0.0.1",
         "build": "vite build",
+        "build:no-hash": "NO_HASH=true vite build",
         "preview": "vite preview --host 127.0.0.1",
         "assets:prepare": "node ./scripts/assets.mjs prepare",
         "assets:sprites": "node ./scripts/assets.mjs sprites",
