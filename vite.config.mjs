@@ -3,11 +3,76 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import fg from "fast-glob";
+import * as prettier from "prettier";
 import { prepareAssets } from "./scripts/assets.mjs";
 
 const rootDir = fileURLToPath(new URL(".", import.meta.url));
 const partialsRoot = path.resolve(rootDir, "src");
 const viewsRoot = path.resolve(rootDir, "src/views");
+const buildLockPath = path.resolve(rootDir, ".vite-build.lock");
+
+function isProcessRunning(pid) {
+    try {
+        process.kill(pid, 0);
+        return true;
+    } catch (error) {
+        if (error.code === "ESRCH") {
+            return false;
+        }
+
+        return true;
+    }
+}
+
+async function acquireBuildLock() {
+    const lockPayload = JSON.stringify(
+        {
+            pid: process.pid,
+            startedAt: new Date().toISOString()
+        },
+        null,
+        2
+    );
+
+    try {
+        const handle = await fs.open(buildLockPath, "wx");
+        await handle.writeFile(lockPayload);
+        await handle.close();
+        return;
+    } catch (error) {
+        if (error.code !== "EEXIST") {
+            throw error;
+        }
+    }
+
+    try {
+        const existingLock = JSON.parse(await fs.readFile(buildLockPath, "utf8"));
+
+        if (!existingLock.pid || !isProcessRunning(existingLock.pid)) {
+            await fs.rm(buildLockPath, { force: true });
+            return acquireBuildLock();
+        }
+
+        throw new Error(
+            `Another build is already running (pid ${existingLock.pid}). Wait for it to finish before starting a new build.`
+        );
+    } catch (error) {
+        if (error.code === "ENOENT") {
+            return acquireBuildLock();
+        }
+
+        if (error instanceof SyntaxError) {
+            await fs.rm(buildLockPath, { force: true });
+            return acquireBuildLock();
+        }
+
+        throw error;
+    }
+}
+
+async function releaseBuildLock() {
+    await fs.rm(buildLockPath, { force: true });
+}
 
 function replaceTemplateTokens(source, context) {
     return source.replace(/@@([a-zA-Z0-9_-]+)/g, (_, key) => `${context[key] ?? ""}`);
@@ -145,12 +210,22 @@ function flattenHtmlEntriesPlugin() {
                 cwd: nestedViewsDir,
                 onlyFiles: true
             }).catch(() => []);
+            const prettierOptions = (await prettier.resolveConfig(rootDir)) ?? {};
 
             for (const entryName of htmlEntries) {
-                await fs.rename(
-                    path.join(nestedViewsDir, entryName),
-                    path.join(outDir, path.basename(entryName))
-                );
+                const fromPath = path.join(nestedViewsDir, entryName);
+                const toPath = path.join(outDir, path.basename(entryName));
+
+                await fs.rename(fromPath, toPath);
+
+                const html = await fs.readFile(toPath, "utf8");
+                const formattedHtml = await prettier.format(html, {
+                    ...prettierOptions,
+                    filepath: toPath,
+                    parser: "html"
+                });
+
+                await fs.writeFile(toPath, formattedHtml);
             }
 
             if (htmlEntries.length > 0) {
@@ -158,6 +233,31 @@ function flattenHtmlEntriesPlugin() {
                     force: true,
                     recursive: true
                 });
+            }
+        }
+    };
+}
+
+function buildLockPlugin() {
+    let hasLock = false;
+
+    return {
+        name: "build-lock",
+        apply: "build",
+        async buildStart() {
+            await acquireBuildLock();
+            hasLock = true;
+        },
+        async buildEnd() {
+            if (hasLock) {
+                await releaseBuildLock();
+                hasLock = false;
+            }
+        },
+        async closeBundle() {
+            if (hasLock) {
+                await releaseBuildLock();
+                hasLock = false;
             }
         }
     };
@@ -175,10 +275,17 @@ const htmlEntries = Object.fromEntries(
 
 export default defineConfig(({ mode }) => ({
     plugins: [
+        buildLockPlugin(),
         ...(mode === "test" ? [] : [assetPipelinePlugin()]),
         partialsPlugin(),
         flattenHtmlEntriesPlugin()
     ],
+    server: {
+        host: true
+    },
+    preview: {
+        host: true
+    },
     resolve: {
         alias: {
             "@": path.resolve(rootDir, "src"),
@@ -190,6 +297,7 @@ export default defineConfig(({ mode }) => ({
         postcss: "./postcss.config.js",
         preprocessorOptions: {
             scss: {
+                api: "modern-compiler",
                 additionalData: `@use "@/styles/helpers/_mixins.scss" as *;@use "@/styles/helpers/_functions.scss" as *;`
             }
         }
@@ -201,25 +309,29 @@ export default defineConfig(({ mode }) => ({
             input: htmlEntries,
             output: {
                 entryFileNames: () => {
-                    const noHash = process.env.NO_HASH === 'true';
-                    return noHash ? 'assets/js/[name].min.js' : 'assets/js/[name]-[hash].min.js';
+                    const noHash = process.env.NO_HASH === "true";
+                    return noHash ? "assets/js/[name].min.js" : "assets/js/[name]-[hash].min.js";
                 },
                 chunkFileNames: () => {
-                    const noHash = process.env.NO_HASH === 'true';
-                    return noHash ? 'assets/js/[name].min.js' : 'assets/js/[name]-[hash].min.js';
+                    const noHash = process.env.NO_HASH === "true";
+                    return noHash ? "assets/js/[name].min.js" : "assets/js/[name]-[hash].min.js";
                 },
                 assetFileNames: (assetInfo) => {
-                    const noHash = process.env.NO_HASH === 'true';
-                    const fileName = assetInfo.names?.[0] || assetInfo.name || '';
-                    const extType = fileName.split('.').pop();
-                    if (extType === 'css') {
-                        return noHash ? 'assets/styles/main.min.css' : 'assets/styles/main-[hash].min.css';
+                    const noHash = process.env.NO_HASH === "true";
+                    const fileName = assetInfo.names?.[0] || assetInfo.name || "";
+                    const extType = fileName.split(".").pop();
+                    if (extType === "css") {
+                        return noHash
+                            ? "assets/styles/main.min.css"
+                            : "assets/styles/main-[hash].min.css";
                     }
-                    return noHash ? `assets/${extType}/[name].[ext]` : `assets/${extType}/[name]-[hash].[ext]`;
+                    return noHash
+                        ? `assets/${extType}/[name].[ext]`
+                        : `assets/${extType}/[name]-[hash].[ext]`;
                 },
                 manualChunks(id) {
-                    if (id.includes('node_modules')) {
-                        return 'vendor';
+                    if (id.includes("node_modules")) {
+                        return "vendor";
                     }
                 }
             }

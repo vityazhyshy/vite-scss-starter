@@ -1,111 +1,80 @@
 # vite-scss-starter
 
-Современный frontend starter для многостраничных сайтов с привычным БЭМ-подходом, `@@include`-шаблонами и отдельными командами под типовые задачи.
+Современный starter для многостраничных проектов на `Vite + SCSS + Vanilla JS` с HTML-шаблонами через `@@include(...)`, генераторами страниц и БЭМ-блоков, а также встроенным asset pipeline.
 
-Сборщик переведён на современный стек, но концепция исходного проекта сохранена:
+Проект остается MPA без React, Vue и других SPA-фреймворков:
 
 - страницы лежат в `src/views`
-- БЭМ-блоки лежат в `src/blocks/modules` и `src/blocks/components`
-- HTML блоков подключается прямо в страницы через `@@include(...)`
-- SCSS блоков подключается через агрегаторы
+- крупные блоки лежат в `src/blocks/modules`
+- мелкие переиспользуемые элементы лежат в `src/blocks/components`
+- HTML подключается через `@@include(...)`
+- SCSS подключается через агрегаторы
 - JS блоков подключается через `src/js/import`
-- изображения, спрайты, WebP и favicon собираются отдельными командами
 
-## 📌 Оглавление
+## Возможности
 
-1. [Возможности](#-возможности)
-2. [Установка](#-установка)
-3. [Быстрый старт за 5 минут](#-быстрый-старт-за-5-минут)
-4. [Где писать код? (Важно!)](#-где-писать-код-важно)
-5. [Словарь терминов сборки](#-словарь-терминов-сборки)
-6. [Структура проекта](#-структура-проекта)
-7. [Основная идея](#-основная-идея)
-8. [Команды](#-команды)
-9. [Как создавать новую страницу](#-как-создавать-новую-страницу)
-10. [Как создавать новый БЭМ-блок](#-как-создавать-новый-бэм-блок)
-11. [Как создавать новый компонент](#-как-создавать-новый-компонент)
-12. [Здоровый БЭМ: Как писать классы?](#-здоровый-бэм-как-писать-классы)
-13. [Изображения, SVG-спрайты и Favicons](#-изображения)
-14. [Шрифты](#-шрифты)
-15. [Стили](#-стили)
-16. [Как подключать сторонние библиотеки](#-как-подключать-сторонние-библиотеки-swiper-gsap-bootstrap)
-17. [Линтинг, форматирование и проверки перед коммитом](#-линтинг-форматирование-и-проверки-перед-коммитом)
-18. [Рекомендованный сценарий работы](#-рекомендованный-сценарий-работы)
-19. [Что важно знать](#-что-важно-знать)
-
-## ⚡ Возможности
-
-- БЭМ-структура проекта
+- Vite dev server и production build
 - SCSS + PostCSS + Autoprefixer
 - HTML partials через `@@include(...)`
-- многостраничная сборка
+- автоформатирование итоговых HTML при build
+- сборка MPA-страниц из `src/views/*.html`
 - генерация SVG-спрайта
 - оптимизация изображений
 - генерация WebP
 - генерация favicon
-- генератор БЭМ-блоков и компонентов
-- генератор новых страниц
-- ESLint для JS
-- Stylelint для SCSS/CSS
-- Prettier для форматирования
-- проверки перед коммитом через Husky + lint-staged
-- smoke-тесты через Vitest
+- генераторы страниц, модулей и компонентов
+- ESLint, Stylelint, Prettier
+- smoke-тесты на Vitest
+- единая команда полной проверки перед релизом
+- отчет по размеру build-артефактов
+- защита от параллельных production-сборок в один `dist`
 
-## 📦 Установка
+## Требования
 
-1. Установите Node.js версии `18.20+`.
-   Рекомендуется использовать `nvm`.
-2. Клонируйте репозиторий:
+- Node.js `18.20+`
+- npm `10+`
 
-```bash
-git clone https://github.com/vityazhyshy/vite-scss-starter.git
-cd vite-scss-starter
-```
-
-3. Установите зависимости:
+## Установка
 
 ```bash
 npm install
 ```
 
-4. Запустите режим разработки:
+## Быстрый старт
+
+Запуск режима разработки:
 
 ```bash
 npm run dev
 ```
 
-5. Для production-сборки используйте:
+Vite будет доступен по:
+
+- `http://localhost:5173`
+- локальному IP в вашей сети, например `http://192.168.0.10:5173`
+
+Production build:
 
 ```bash
 npm run build
 ```
 
-Если всё настроено правильно, локальный сервер будет доступен по адресу `http://127.0.0.1:5173/`.
+Production build без хэшей:
 
-## 🚀 Быстрый старт за 5 минут
+```bash
+npm run build:no-hash
+```
 
-Давайте создадим вашу первую страницу с новым блоком, чтобы понять, как всё работает:
+Локальный просмотр production build:
 
-1. **Запустите проект:**
-   Откройте терминал в папке проекта и введите: `npm run dev`.
-   Перейдите в браузере по ссылке `http://localhost:5173`. Вы увидите стартовую страницу. Не закрывайте этот терминал!
-2. **Создайте новую страницу:**
-   Откройте **новую** вкладку терминала (в этой же папке) и введите:
-   `npm run new:page -- my-test`
-   Сборщик создаст файл `src/views/my-test.html`.
-3. **Создайте новый блок для этой страницы:**
-   В терминале введите:
-   `npm run block -- --type=module --page=my-test welcome-banner`
-   Сборщик сам создаст HTML, CSS и JS для блока `welcome-banner` и сразу подключит его к странице `my-test.html`.
-4. **Проверьте результат:**
-   Зайдите в `src/blocks/modules/welcome-banner/welcome-banner.html`, напишите там `<h1>Привет, мир!</h1>`.
-   Откройте в браузере `http://localhost:5173/my-test.html` и вы увидите свой новый блок!
+```bash
+npm run preview
+```
 
-## 📁 Структура проекта
+## Структура проекта
 
 ```text
 vite-scss-starter
-├── dist
 ├── public
 │   └── img
 ├── scripts
@@ -115,515 +84,272 @@ vite-scss-starter
 │   │   ├── modules
 │   │   ├── _components.scss
 │   │   └── _modules.scss
-│   ├── fonts
 │   ├── img
-│   │   ├── favicon
-│   │   └── sprites
 │   ├── js
 │   │   ├── import
 │   │   └── main.js
 │   ├── styles
-│   ├── views
-│   │   ├── pages
-│   │   │   └── page.html
-│   │   ├── 404.html
-│   │   └── index.html
-├── eslint.config.mjs
-├── postcss.config.js
+│   └── views
+│       ├── pages
+│       │   └── page.html
+│       ├── 404.html
+│       └── index.html
+├── tests
 ├── package.json
 └── vite.config.mjs
 ```
 
-## 🛑 Где писать код? (Важно!)
+## Где писать код
 
-- **ВЕСЬ ваш код (HTML, CSS, JS) пишется ТОЛЬКО в папке `src/`.**
-- **НИКОГДА** не редактируйте файлы в папках `dist/` или `public/img/`. Папка `dist` перезаписывается при каждой сборке проекта, а `public/img` обновляется автоматически из `src/img`.
-- **Изображения** кладем в `src/img/`. После запуска оптимизации они автоматически попадут в `public/img/`.
+Весь исходный код пишется только в `src/`.
 
-## 📖 Словарь терминов сборки
+Не редактируйте:
 
-В сборке используется БЭМ-подход. Ваши блоки делятся на две папки:
+- `dist/` — это итог build
+- `public/img/` — это сгенерированные ассеты из `src/img`
 
-- **Модули (`src/blocks/modules`)** — это крупные, самостоятельные части страницы (Шапка, Подвал, Секция со слайдером, Блок с тарифами).
-- **Компоненты (`src/blocks/components`)** — это мелкие элементы, которые могут переиспользоваться внутри модулей (Кнопка, Поле ввода, Декоративная иконка).
-- **`@@include`** — это специальная команда, которая говорит сборщику: "Возьми кусок HTML-кода из другого файла и вставь его сюда". Это позволяет, например, не копировать один и тот же код шапки на 10 разных страниц, а подключить его одной строчкой.
+Исходные изображения и SVG нужно хранить в `src/img`.
 
-## 💡 Основная идея
+## Основные команды
 
-### Страницы
+### Разработка и сборка
 
-- Все рабочие страницы лежат в `src/views`.
-- Главная страница: `src/views/index.html`
-- Страница 404: `src/views/404.html`
-- Шаблон новой страницы: `src/views/pages/page.html`
+- `npm run dev` — dev server
+- `npm run build` — production build с хэшами
+- `npm run build:no-hash` — production build без хэшей
+- `npm run preview` — preview production build
 
-Важно:
+### Полные проверки
 
-- `src/views/pages/page.html` не является отдельной страницей сайта.
-- Это шаблон, который используется командой `new:page`.
+- `npm run build:check` — `format:check + lint + test + build`
+- `npm run build:report` — `build + отчет по размеру файлов в dist`
 
-### Блоки
+### Линтинг и форматирование
 
-- Каждый БЭМ-блок лежит в своей папке внутри `src/blocks/modules`.
-- Каждый компонент лежит в `src/blocks/components`.
-- У блока могут быть:
-    - HTML-файл
-    - SCSS-файл
-    - JS-файл
+- `npm run lint`
+- `npm run lint:fix`
+- `npm run lint:js`
+- `npm run lint:scripts`
+- `npm run lint:scripts:fix`
+- `npm run lint:styles`
+- `npm run lint:styles:fix`
+- `npm run format`
+- `npm run format:check`
 
-Пример структуры блока:
+### Тесты
 
-```text
-src/blocks/modules/hero
-├── hero.html
-├── hero.scss
-└── hero.js
-```
+- `npm run test`
+- `npm run test:watch`
 
-Если JS для блока не нужен, файл можно удалить и не импортировать.
+### Ассеты
 
-### Подключение блока
+- `npm run assets:prepare`
+- `npm run assets:sprites`
+- `npm run assets:images`
+- `npm run assets:webp`
+- `npm run assets:favicons`
 
-HTML блока подключается прямо в страницу:
-
-```html
-@@include('../blocks/modules/hero/hero.html')
-```
-
-SCSS блока подключается в:
-
-```text
-src/blocks/_modules.scss
-```
-
-JS блока подключается в:
-
-```text
-src/js/import/modules.js
-```
-
-Именно такой поток и является основным для этого starter.
-
-## 💻 Команды
-
-### Основные
-
-- `npm run dev` — запуск dev-сервера
-- `npm run build` — production-сборка (файлы с хэшем)
-- `npm run build:no-hash` — production-сборка (файлы без хэша: `main.min.js`, `vendor.min.js`, `main.min.css`)
-- `npm run preview` — просмотр production-сборки
-
-### Генерация блоков и страниц
-
-- `npm run bem-m -- hero` — создать модуль `hero`
-- `npm run bem-c -- button` — создать компонент `button`
-- `npm run block -- --type=module hero` — то же самое, явный вариант
-- `npm run block -- --type=module --page=index hero` — создать блок и сразу подключить его в `src/views/index.html`
-- `npm run new:page -- about` — создать новую страницу `src/views/about.html` по шаблону
-- `npm run new:page -- company-services` — создать страницу `company-services.html`
-
-### Изображения и ассеты
-
-- `npm run assets:prepare` — прогнать весь asset pipeline
-- `npm run assets:sprites` — собрать SVG-спрайт
-- `npm run assets:images` — оптимизировать изображения
-- `npm run assets:webp` — сгенерировать WebP
-- `npm run assets:favicons` — сгенерировать favicon
-
-### Совместимые алиасы
+Совместимые алиасы:
 
 - `npm run build:sprites`
 - `npm run build:images`
 - `npm run build:webp`
 - `npm run build:favicons`
 
-### Линтинг и форматирование
+### Генераторы
 
-- `npm run lint` — проверить JS и стили
-- `npm run lint:js` — проверить JS
-- `npm run lint:scripts` — алиас для проверки JS
-- `npm run lint:styles` — проверить стили
-- `npm run lint:fix` — исправить доступные проблемы автоматически
-- `npm run lint:scripts:fix` — исправить JS
-- `npm run lint:styles:fix` — исправить стили
-- `npm run format` — форматировать проект через Prettier
-- `npm run format:check` — проверить форматирование
-- `npm run test` — запустить smoke-тесты
+- `npm run new:page -- about`
+- `npm run block -- --type=module hero`
+- `npm run block -- --type=module --page=index hero`
+- `npm run block -- --type=component button`
+- `npm run bem-m -- hero`
+- `npm run bem-c -- button`
 
-## 📄 Как создавать новую страницу
+## Как создавать страницу
 
-1. Выполните команду:
+Создать новую страницу:
 
 ```bash
 npm run new:page -- about
 ```
 
-2. Сборщик создаст файл:
+Будет создан файл:
 
 ```text
 src/views/about.html
 ```
 
-3. Откройте страницу и заполните `<main>`:
-
-```html
-<main class="main" role="main">@@include('../blocks/modules/hero/hero.html')</main>
-```
-
-4. Если нужен новый блок для этой страницы, создайте его:
-
-```bash
-npm run block -- --type=module --page=about about-hero
-```
-
-Эта команда:
-
-- создаст папку блока
-- создаст HTML, SCSS и JS файлы блока
-- добавит SCSS блока в `src/blocks/_modules.scss`
-- добавит JS блока в `src/js/import/modules.js`
-- вставит `@@include(...)` блока в `src/views/about.html`
-
-## 🧱 Как создавать новый БЭМ-блок
-
-Пример:
-
-```bash
-npm run bem-m -- promo
-```
-
-Будет создано:
+Источник шаблона:
 
 ```text
-src/blocks/modules/promo
-├── promo.html
-├── promo.scss
-└── promo.js
+src/views/pages/page.html
 ```
 
-После этого автоматически обновятся:
-
-- `src/blocks/_modules.scss`
-- `src/js/import/modules.js`
-
-Если указать `--page`, блок также автоматически подключится в нужную страницу.
-
-Пример:
+Дополнительно можно передать title:
 
 ```bash
-npm run block -- --type=module --page=index promo
+npm run new:page -- --title="About Company" about
 ```
 
-## 🧩 Как создавать новый компонент
+## Как создавать модуль или компонент
 
-Пример:
+Создать модуль:
+
+```bash
+npm run bem-m -- hero
+```
+
+Или:
+
+```bash
+npm run block -- --type=module hero
+```
+
+Будут созданы:
+
+```text
+src/blocks/modules/hero/hero.html
+src/blocks/modules/hero/hero.scss
+src/blocks/modules/hero/hero.js
+```
+
+Также генератор:
+
+- добавит SCSS в `src/blocks/_modules.scss`
+- добавит JS import в `src/js/import/modules.js`
+- при передаче `--page=<page>` вставит `@@include(...)` в нужную страницу
+
+Создать компонент:
 
 ```bash
 npm run bem-c -- button
 ```
 
-Будет создано:
+Или:
 
-```text
-src/blocks/components/button
-├── button.html
-├── button.scss
-└── button.js
+```bash
+npm run block -- --type=component button
 ```
 
-После этого автоматически обновятся:
+## HTML и шаблоны
 
-- `src/blocks/_components.scss`
-- `src/js/import/components.js`
-
-## 🌿 Здоровый БЭМ: Как писать классы?
-
-В этом стартере мы используем **современный, облегченный БЭМ**. Нам не нужны строгие правила из 2015 года, которые заставляют писать тонны кода.
-
-Вот 3 простых правила, чтобы ваша верстка не ломалась:
-
-**1. Блок и Элемент (Два подчеркивания `__`)**
-Классы внутри блока должны начинаться с имени самого блока.
-✅ `card__title`, `card__image`, `card__button`.
-❌ Никогда не делайте двойную вложенность: `card__body__title` — это зло. Правильно просто `card__title` (неважно, как глубоко в HTML он лежит).
-
-**2. Состояния вместо Модификаторов (Классы `is-*`)**
-Если кнопка стала активной или меню открылось, не пишите длинные модификаторы вроде `menu__link--active`. Используйте простые, глобальные стейт-классы для изменения состояния через JS.
-✅ `menu__link is-active`
-✅ `popup is-open`
-
-```scss
-// Как это стилизовать:
-.menu__link {
-    color: black;
-    &.is-active {
-        color: red;
-    }
-}
-```
-
-**3. Глобальные отступы (Утилиты) разрешены!**
-Если вам нужно отодвинуть кнопку на 20px вниз, не нужно придумывать ей новый класс `card__action-btn_margin_bottom`. Просто добавьте вспомогательный класс (в проекте можно создать файл с такими утилитами):
-✅ `<button class="btn mb-20">Купить</button>`
-
-## HTML partials
-
-В проекте используется синтаксис:
+Страницы и блоки подключаются через:
 
 ```html
-@@include('../blocks/modules/header/header.html')
+@@include("../blocks/modules/hero/hero.html")
 ```
 
-Также можно передавать параметры:
+Можно передавать параметры:
 
 ```html
-@@include('../blocks/modules/head/head.html', { "title": "Главная" })
+@@include("../blocks/modules/header/header.html", { "title": "Home" })
 ```
 
-Этот подход сохранён специально, чтобы работа со страницами и блоками оставалась такой же прямой и понятной, как в исходном starter.
+Во время build:
 
-## 🖼️ Изображения
+- include-файлы разворачиваются
+- итоговые HTML перемещаются в корень `dist`
+- итоговые HTML автоматически форматируются через Prettier
 
-Исходные изображения лежат в:
+## SCSS и стили
 
-```text
-src/img
-```
-
-Сгенерированные файлы попадают в:
-
-```text
-public/img
-```
-
-А затем копируются в `dist` при сборке.
-
-### WebP
-
-Чтобы собрать WebP:
-
-```bash
-npm run assets:webp
-```
-
-### Оптимизация изображений
-
-Чтобы оптимизировать изображения:
-
-```bash
-npm run assets:images
-```
-
-### 🎯 SVG-спрайты
-
-SVG-иконки для спрайта должны лежать в:
-
-```text
-src/img/sprites
-```
-
-Сборка спрайта:
-
-```bash
-npm run assets:sprites
-```
-
-Результат:
-
-```text
-public/img/sprites/sprite.svg
-```
-
-Использование в HTML:
-
-```html
-<svg>
-    <use xlink:href="/img/sprites/sprite.svg#icon-name"></use>
-</svg>
-```
-
-Рекомендация:
-
-- перед использованием очищайте SVG от лишних `fill`, `stroke` и инлайновых стилей, если хотите управлять цветом из CSS
-
-### 🌟 Favicons
-
-Исходный файл favicon должен лежать в:
-
-```text
-src/img/favicon/favicon.png
-```
-
-Рекомендуемый размер:
-
-- не меньше `1024x1024`
-
-Команда генерации:
-
-```bash
-npm run assets:favicons
-```
-
-Результат:
-
-```text
-public/img/favicons
-```
-
-## 🔠 Шрифты
-
-Шрифты хранятся в:
-
-```text
-src/fonts
-```
-
-Подключение шрифтов выполняется в:
-
-```text
-src/styles/base/_fonts.scss
-```
-
-Рекомендуется использовать форматы:
-
-- `.woff`
-- `.woff2`
-
-## 🎨 Стили
-
-Главный SCSS-файл:
+Основная точка входа:
 
 ```text
 src/styles/main.scss
 ```
 
-Токены вынесены в CSS custom properties через `:root`:
+SCSS helper-файлы подключаются глобально через Vite config, поэтому mixins/functions доступны в SCSS без ручного `@use` в каждом файле.
+
+Проект использует lightweight BEM:
+
+- допустимо: `block__element`
+- не использовать: `block__elem__subelem`
+- состояния задаются глобальными классами: `.is-active`, `.is-open`, `.is-hidden`
+
+## JavaScript
+
+Главная точка входа:
 
 ```text
-src/styles/helpers/_variables.scss
+src/js/main.js
 ```
 
-SCSS-миксины и функции лежат в:
+Импорты блоков и компонентов подключаются через:
 
-```text
-src/styles/helpers
-```
+- `src/js/import/modules.js`
+- `src/js/import/components.js`
 
-## 📦 Как подключать сторонние библиотеки (Swiper, GSAP, Bootstrap)
+Если блок создан генератором, нужные импорты добавляются автоматически.
 
-Современная сборка подразумевает, что вы **не скачиваете** архивы с библиотеками вручную и не кидаете их в папку проекта. Вы устанавливаете их через терминал (npm).
+## Изображения и ассеты
 
-### Сценарий 1: Локальное подключение библиотеки (Правильный путь)
+Исходники:
 
-Идеальный вариант для Vite-сборок. Код библиотеки попадает только туда, где он реально нужен, не утяжеляя остальной сайт.
+- `src/img/favicon` — favicon source
+- `src/img/sprites` — SVG для sprite
+- остальные изображения — в `src/img`
 
-1. **Установите нужный пакет.** Откройте терминал в корне проекта и напишите:
-    ```bash
-    npm install swiper
-    ```
-2. **Импортируйте библиотеку в нужном блоке.** Например, в `src/blocks/modules/hero/hero.js`:
+Результат asset pipeline:
 
-    ```javascript
-    // Подключаем JS
-    import Swiper from "swiper";
-    import { Navigation, Pagination } from "swiper/modules";
+- оптимизированные изображения попадают в `public/img`
+- SVG-спрайт собирается в `public/img/sprites/sprite.svg`
+- favicon генерируется в `public/img/favicons`
 
-    // Подключаем CSS (Vite сам разберется, что это стили)
-    import "swiper/css";
-    import "swiper/css/navigation";
-    import "swiper/css/pagination";
+Во время `build` asset pipeline запускается автоматически.
 
-    // Инициализируем
-    const swiper = new Swiper(".hero__slider", {
-        modules: [Navigation, Pagination],
-        loop: true
-    });
-    ```
+В dev-режиме изменения в `src/img` тоже отслеживаются.
 
-### Сценарий 2: Глобальное подключение (Если библиотека нужна везде)
+## Build output
 
-Если вы используете GSAP для анимаций по всему сайту на каждой странице, или Bootstrap сетку.
+По умолчанию build создает:
 
-1. Установите библиотеку: `npm install gsap`
-2. Откройте `src/js/main.js` (главный входной файл JS) и подключите там:
+- HTML в корне `dist`
+- JS в `dist/assets/js`
+- CSS в `dist/assets/styles`
 
-    ```javascript
-    import { gsap } from "gsap";
-    import { ScrollTrigger } from "gsap/ScrollTrigger";
+`npm run build:no-hash` генерирует чистые имена файлов:
 
-    gsap.registerPlugin(ScrollTrigger);
+- `main.min.js`
+- `main.min.css`
 
-    // Теперь вы можете использовать gsap в любых js-файлах своих блоков!
-    ```
+## Проверки перед релизом
 
-### Сценарий 3: "Мне нужен доступ к библиотекам после натяжки на CMS"
-
-Иногда бывает так, что вы отдаете верстку бэкендеру, он натягивает её на WordPress/Битрикс, и там нужно "дописать" инициализацию слайдера прямо в `<script>` на странице, а исходников сборки уже нет (только собранный `dist`).
-
-По умолчанию Vite прячет весь ваш JS внутрь модулей, и переменная `Swiper` не видна в консоли разработчика. Чтобы починить это, нужно "вытащить" библиотеку в глобальную область видимости (сделать её доступной из объекта `window`).
-
-1. Установите библиотеку: `npm install swiper`
-2. В файле `src/js/main.js` привяжите библиотеку к `window`:
-
-    ```javascript
-    import Swiper from "swiper";
-    import { Navigation, Pagination } from "swiper/modules";
-    import "swiper/css/bundle"; // подключаем все стили сразу, если не знаем, какие понадобятся в будущем
-
-    // Делаем Swiper глобальным!
-    window.Swiper = Swiper;
-    window.Navigation = Navigation;
-    window.Pagination = Pagination;
-    ```
-
-3. Теперь, даже на собранном сайте без исходников, любой программист (или вы сами) сможете написать в HTML:
-    ```html
-    <script>
-        // Сработает, потому что Swiper глобальный
-        const mySlider = new Swiper(".slider", {
-            modules: [Navigation, Pagination]
-        });
-    </script>
-    ```
-
-## 🛡️ Линтинг, форматирование и проверки перед коммитом
-
-В проекте используются:
-
-- ESLint
-- Stylelint
-- Prettier
-- Husky
-- lint-staged
-
-Перед коммитом автоматически запускаются:
-
-- линтинг изменённых файлов
-- форматирование изменённых файлов
-- `npm run test`
-
-Это позволяет держать проект в чистом состоянии без ручной рутины.
-
-## ✅ Рекомендованный сценарий работы
-
-1. Запустить `npm run dev`
-2. Создать страницу через `npm run new:page -- page-name`
-3. Создать нужные блоки через `npm run bem-m -- block-name`
-4. Подключать блоки в страницу через `@@include(...)`
-5. Складывать изображения в `src/img`
-6. При необходимости запускать `assets:*` команды
-7. Перед коммитом прогонять:
+Рекомендуемый сценарий:
 
 ```bash
-npm run lint
-npm run format:check
-npm run test
+npm run build:check
 ```
 
-## ⚠️ Что важно знать
+Команда проверяет:
 
-- В исходниках страницы лежат в `src/views`, а не в корне проекта.
-- В `dist` HTML-файлы складываются в корень сборки.
-- `src/views/pages/page.html` нужен как шаблон для новых страниц.
-- Лишние demo-layout файлы и промежуточные partial pages из проекта убраны.
-- Starter ориентирован на быстрый запуск типовых многостраничных сайтов, а не на SPA-архитектуру.
+1. форматирование
+2. линтинг
+3. smoke-тесты
+4. production build
+
+Если нужен отчет по весу артефактов:
+
+```bash
+npm run build:report
+```
+
+## Важные особенности
+
+- Не запускайте две production-сборки одновременно в один `dist`: проект теперь сам блокирует второй build понятной ошибкой.
+- `build:no-hash` удобен для интеграций, где нужны стабильные имена файлов.
+- `preview` и `dev` доступны и по `localhost`, и по локальному IP.
+- В репозитории не должны храниться локальные пути, пароли, токены, ключи и другие чувствительные данные.
+
+## Рекомендованный рабочий поток
+
+1. `npm install`
+2. `npm run dev`
+3. создавайте страницы и блоки через генераторы
+4. складывайте исходные изображения в `src/img`
+5. перед релизом запускайте `npm run build:check`
+6. при необходимости смотрите размеры через `npm run build:report`
+
+## Лицензия
+
+`GPL-3.0-only`

@@ -10,10 +10,12 @@
         "url": "https://github.com/vityazhyshy/vite-scss-starter.git"
     },
     "scripts": {
-        "dev": "vite --host 127.0.0.1",
+        "dev": "vite",
         "build": "vite build",
         "build:no-hash": "NO_HASH=true vite build",
-        "preview": "vite preview --host 127.0.0.1",
+        "build:check": "npm run format:check && npm run lint && npm run test && npm run build",
+        "build:report": "npm run build && node ./scripts/build-report.mjs",
+        "preview": "vite preview",
         "assets:prepare": "node ./scripts/assets.mjs prepare",
         "assets:sprites": "node ./scripts/assets.mjs sprites",
         "assets:images": "node ./scripts/assets.mjs images",
