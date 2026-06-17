@@ -75,7 +75,10 @@ async function releaseBuildLock() {
 }
 
 function replaceTemplateTokens(source, context) {
-    return source.replace(/@@([a-zA-Z0-9_-]+)/g, (_, key) => `${context[key] ?? ""}`);
+    return source.replace(
+        /@@(?!include\s*\()([a-zA-Z0-9_-]+)/g,
+        (_, key) => `${context[key] ?? ""}`
+    );
 }
 
 async function resolveHtmlIncludes(source, fromFile, context = {}) {
