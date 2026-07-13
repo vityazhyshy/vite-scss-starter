@@ -284,7 +284,8 @@ export default defineConfig(({ mode }) => ({
         flattenHtmlEntriesPlugin()
     ],
     server: {
-        host: true
+        host: true,
+        open: true
     },
     preview: {
         host: true
