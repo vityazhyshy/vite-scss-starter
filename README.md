@@ -9,7 +9,7 @@
 - HTML блоков подключается прямо в страницы через `@@include(...)`
 - SCSS блоков подключается через агрегаторы
 - JS блоков подключается через `src/js/import`
-- изображения, спрайты, WebP и favicon собираются отдельными командами
+- контентные изображения обрабатываются Vite, а SVG-спрайт и favicon собираются отдельными командами
 
 ## 📌 Оглавление
 
@@ -42,7 +42,6 @@
 - автоматическое форматирование итоговых HTML при production build
 - генерация SVG-спрайта
 - оптимизация изображений
-- генерация WebP
 - генерация favicon
 - генератор БЭМ-блоков и компонентов
 - генератор новых страниц
@@ -128,10 +127,11 @@ vite-scss-starter
 │   │   ├── modules
 │   │   ├── _components.scss
 │   │   └── _modules.scss
-│   ├── fonts
-│   ├── img
-│   │   ├── favicon
+│   ├── assets
+│   │   ├── favicons
+│   │   ├── images
 │   │   └── sprites
+│   ├── fonts
 │   ├── js
 │   │   ├── import
 │   │   └── main.js
@@ -150,8 +150,10 @@ vite-scss-starter
 ## 🛑 Где писать код? (Важно!)
 
 - **ВЕСЬ ваш код (HTML, CSS, JS) пишется ТОЛЬКО в папке `src/`.**
-- **НИКОГДА** не редактируйте файлы в папках `dist/` или `public/img/`. Папка `dist` перезаписывается при каждой сборке проекта, а `public/img` обновляется автоматически из `src/img`.
-- **Изображения** кладем в `src/img/`. После запуска оптимизации они автоматически попадут в `public/img/`.
+- **НИКОГДА** не редактируйте файлы в папках `dist/` или `public/img/`. Папка `dist` перезаписывается при каждой сборке проекта, а `public/img` используется только для сгенерированных sprite/favicon файлов.
+- **Контентные изображения** кладем в `src/assets/images/` и подключаем через Vite.
+- **SVG для спрайта** кладем в `src/assets/sprites/`.
+- **Исходник favicon** кладем в `src/assets/favicons/favicon.png`.
 
 ## 📖 Словарь терминов сборки
 
@@ -239,15 +241,11 @@ src/js/import/modules.js
 
 - `npm run assets:prepare` — прогнать весь asset pipeline
 - `npm run assets:sprites` — собрать SVG-спрайт
-- `npm run assets:images` — оптимизировать изображения
-- `npm run assets:webp` — сгенерировать WebP
 - `npm run assets:favicons` — сгенерировать favicon
 
 ### Совместимые алиасы
 
 - `npm run build:sprites`
-- `npm run build:images`
-- `npm run build:webp`
 - `npm run build:favicons`
 
 ### Линтинг и форматирование
@@ -407,42 +405,34 @@ src/blocks/components/button
 
 ## 🖼️ Изображения
 
-Исходные изображения лежат в:
+Контентные изображения лежат в:
 
 ```text
-src/img
+src/assets/images
 ```
 
-Сгенерированные файлы попадают в:
+Их лучше подключать напрямую через Vite:
 
-```text
-public/img
+```html
+<img src="/src/assets/images/photo.jpg" alt="Описание изображения" />
 ```
 
-А затем копируются в `dist` при сборке.
+или в SCSS:
 
-### WebP
-
-Чтобы собрать WebP:
-
-```bash
-npm run assets:webp
+```scss
+.hero {
+    background-image: url("/src/assets/images/photo.jpg");
+}
 ```
 
-### Оптимизация изображений
-
-Чтобы оптимизировать изображения:
-
-```bash
-npm run assets:images
-```
+Во время build Vite сам добавит такие файлы в граф сборки, положит их в `dist/assets` и перепишет ссылки на итоговые файлы с хэшами.
 
 ### 🎯 SVG-спрайты
 
 SVG-иконки для спрайта должны лежать в:
 
 ```text
-src/img/sprites
+src/assets/sprites
 ```
 
 Сборка спрайта:
@@ -474,7 +464,7 @@ public/img/sprites/sprite.svg
 Исходный файл favicon должен лежать в:
 
 ```text
-src/img/favicon/favicon.png
+src/assets/favicons/favicon.png
 ```
 
 Рекомендуемый размер:
@@ -656,8 +646,8 @@ npm run build:report
 2. Создать страницу через `npm run new:page -- page-name`
 3. Создать нужные блоки через `npm run bem-m -- block-name`
 4. Подключать блоки в страницу через `@@include(...)`
-5. Складывать изображения в `src/img`
-6. При необходимости запускать `assets:*` команды
+5. Складывать контентные изображения в `src/assets/images`
+6. При необходимости запускать `assets:*` команды для sprite/favicon
 7. Перед коммитом прогонять:
 
 ```bash

@@ -6,14 +6,11 @@ import { parseArgs } from "node:util";
 import fg from "fast-glob";
 
 const rootDir = fileURLToPath(new URL("..", import.meta.url));
-const srcImgDir = path.join(rootDir, "src", "img");
+const srcAssetsDir = path.join(rootDir, "src", "assets");
 const publicDir = path.join(rootDir, "public");
 const publicImgDir = path.join(publicDir, "img");
-const faviconSource = path.join(srcImgDir, "favicon", "favicon.png");
-const spriteSourceDir = path.join(srcImgDir, "sprites");
-
-const rasterExtensions = new Set([".jpg", ".jpeg", ".png"]);
-const passthroughExtensions = new Set([".gif", ".webp", ".avif"]);
+const faviconSource = path.join(srcAssetsDir, "favicons", "favicon.png");
+const spriteSourceDir = path.join(srcAssetsDir, "sprites");
 
 async function ensureDir(dirPath) {
     await fs.mkdir(dirPath, { recursive: true });
@@ -98,104 +95,6 @@ export async function buildSprites() {
     return { task: "sprites", count: files.length, outDir };
 }
 
-export async function optimizeImages() {
-    const { default: sharp } = await import("sharp");
-    const { optimize: optimizeSvg } = await import("svgo");
-    const files = await fg("**/*.{jpg,jpeg,png,gif,svg,avif,webp}", {
-        cwd: srcImgDir,
-        absolute: true,
-        onlyFiles: true,
-        ignore: ["favicon/**", "sprites/**"]
-    });
-
-    const copied = [];
-
-    for (const filePath of files) {
-        const relativePath = path.relative(srcImgDir, filePath);
-        const targetPath = path.join(publicImgDir, relativePath);
-        const extension = path.extname(filePath).toLowerCase();
-
-        await ensureDir(path.dirname(targetPath));
-
-        if (extension === ".svg") {
-            const input = await fs.readFile(filePath, "utf8");
-            const output = optimizeSvg(input, {
-                path: filePath,
-                plugins: [
-                    {
-                        name: "preset-default",
-                        params: {
-                            overrides: {
-                                removeViewBox: false
-                            }
-                        }
-                    }
-                ]
-            });
-            await fs.writeFile(targetPath, output.data);
-            copied.push(targetPath);
-            continue;
-        }
-
-        if (rasterExtensions.has(extension)) {
-            let pipeline = sharp(filePath);
-
-            if (extension === ".jpg" || extension === ".jpeg") {
-                pipeline = pipeline.jpeg({
-                    quality: 82,
-                    mozjpeg: true
-                });
-            } else if (extension === ".png") {
-                pipeline = pipeline.png({
-                    compressionLevel: 9,
-                    palette: true
-                });
-            }
-
-            await pipeline.toFile(targetPath);
-            copied.push(targetPath);
-            continue;
-        }
-
-        if (passthroughExtensions.has(extension)) {
-            await fs.copyFile(filePath, targetPath);
-            copied.push(targetPath);
-        }
-    }
-
-    return { task: "images", count: copied.length };
-}
-
-export async function generateWebp() {
-    const { default: sharp } = await import("sharp");
-    const files = await fg("**/*.{jpg,jpeg,png}", {
-        cwd: srcImgDir,
-        absolute: true,
-        onlyFiles: true,
-        ignore: ["favicon/**", "sprites/**"]
-    });
-
-    const generated = [];
-
-    for (const filePath of files) {
-        const relativePath = path.relative(srcImgDir, filePath);
-        const targetPath = path
-            .join(publicImgDir, relativePath)
-            .replace(/\.(png|jpe?g)$/i, ".webp");
-
-        await ensureDir(path.dirname(targetPath));
-        await sharp(filePath)
-            .webp({
-                quality: 84
-            })
-            .toFile(targetPath);
-
-        generated.push(targetPath);
-    }
-
-    return { task: "webp", count: generated.length };
-}
-
 export async function generateFavicons() {
     const { favicons } = await import("favicons");
     const outDir = path.join(publicImgDir, "favicons");
@@ -245,8 +144,10 @@ export async function generateFavicons() {
 }
 
 export async function prepareAssets() {
-    const commands = ["sprites", "images", "webp", "favicons"];
+    const commands = ["sprites", "favicons"];
     const results = [];
+
+    await emptyDir(publicImgDir);
 
     for (const command of commands) {
         results.push(await runSubcommand(command));
@@ -297,8 +198,6 @@ async function main() {
     const tasks = {
         prepare: prepareAssets,
         sprites: buildSprites,
-        images: optimizeImages,
-        webp: generateWebp,
         favicons: generateFavicons
     };
 

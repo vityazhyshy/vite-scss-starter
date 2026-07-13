@@ -74,58 +74,11 @@ async function releaseBuildLock() {
     await fs.rm(buildLockPath, { force: true });
 }
 
-async function fileExists(filePath) {
-    try {
-        await fs.access(filePath);
-        return true;
-    } catch {
-        return false;
-    }
-}
-
 function replaceTemplateTokens(source, context) {
     return source.replace(
         /@@(?!include\s*\()([a-zA-Z0-9_-]+)/g,
         (_, key) => `${context[key] ?? ""}`
     );
-}
-
-async function replaceHtmlImageRefsWithWebp(html, outDir) {
-    const imageRefPattern =
-        /(\b(?:src|srcset|href)\s*=\s*["'])([^"']+\.(?:png|jpe?g))((?:\s+\d+[wx])?)(["'])/gi;
-    const replacements = new Map();
-    const matches = [...html.matchAll(imageRefPattern)];
-
-    for (const match of matches) {
-        const originalRef = match[2];
-        const cleanRef = originalRef.split("?")[0].split("#")[0];
-
-        if (/^(https?:)?\/\//i.test(cleanRef) || cleanRef.startsWith("data:")) {
-            continue;
-        }
-
-        const webpRef = cleanRef.replace(/\.(png|jpe?g)$/i, ".webp");
-        const relativeRef = webpRef.replace(/^\//, "");
-        const webpPath = path.join(outDir, relativeRef);
-
-        if (await fileExists(webpPath)) {
-            replacements.set(originalRef, originalRef.replace(cleanRef, webpRef));
-        }
-    }
-
-    if (replacements.size === 0) {
-        return html;
-    }
-
-    return html.replace(imageRefPattern, (fullMatch, prefix, ref, descriptor, suffix) => {
-        const replacement = replacements.get(ref);
-
-        if (!replacement) {
-            return fullMatch;
-        }
-
-        return `${prefix}${replacement}${descriptor}${suffix}`;
-    });
 }
 
 async function resolveHtmlIncludes(source, fromFile, context = {}) {
@@ -230,19 +183,19 @@ function assetPipelinePlugin() {
             return run();
         },
         configureServer(server) {
-            server.watcher.add(path.join(srcImgDir, "**/*"));
+            server.watcher.add(path.join(srcAssetsDir, "**/*"));
             server.watcher.on("add", (filePath) => {
-                if (filePath.startsWith(srcImgDir)) {
+                if (filePath.startsWith(srcAssetsDir)) {
                     run();
                 }
             });
             server.watcher.on("change", (filePath) => {
-                if (filePath.startsWith(srcImgDir)) {
+                if (filePath.startsWith(srcAssetsDir)) {
                     run();
                 }
             });
             server.watcher.on("unlink", (filePath) => {
-                if (filePath.startsWith(srcImgDir)) {
+                if (filePath.startsWith(srcAssetsDir)) {
                     run();
                 }
             });
@@ -269,8 +222,7 @@ function flattenHtmlEntriesPlugin() {
                 await fs.rename(fromPath, toPath);
 
                 const html = await fs.readFile(toPath, "utf8");
-                const htmlWithWebp = await replaceHtmlImageRefsWithWebp(html, outDir);
-                const formattedHtml = await prettier.format(htmlWithWebp, {
+                const formattedHtml = await prettier.format(html, {
                     ...prettierOptions,
                     filepath: toPath,
                     parser: "html"
@@ -314,7 +266,7 @@ function buildLockPlugin() {
     };
 }
 
-const srcImgDir = path.resolve(rootDir, "src/img");
+const srcAssetsDir = path.resolve(rootDir, "src/assets");
 const htmlEntries = Object.fromEntries(
     fg
         .sync("src/views/*.html", {
