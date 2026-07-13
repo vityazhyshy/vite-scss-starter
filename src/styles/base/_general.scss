@@ -1,5 +1,10 @@
 @use "../helpers/mixins" as *;
 
+html {
+    font-size: clamp(13px, 4.324vw, 16px);
+    scroll-behavior: auto !important; // Critical fix for GSAP ScrollTrigger conflicts (overrides Bootstrap 5 default)
+}
+
 html,
 body {
     height: 100%;
@@ -12,6 +17,36 @@ body {
     background:
         radial-gradient(circle at top left, rgb(var(--color-blue-rgb) / 12%), transparent 30%),
         linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+.container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding-right: var(--container-gutter);
+    padding-left: var(--container-gutter);
+}
+
+@media only screen and (min-width: 768px) {
+    html {
+        font-size: clamp(14px, 0.9vw, 18px);
+    }
+
+    .container {
+        --container-gutter: 2rem;
+    }
+}
+
+@media only screen and (min-width: 1280px) {
+    .container {
+        --container-gutter: 4rem;
+    }
+}
+
+@media only screen and (min-width: 1700px) {
+    .container {
+        --container-gutter: 5rem;
+    }
 }
 
 h1,
@@ -35,11 +70,6 @@ input,
 textarea,
 select {
     font: inherit;
-}
-
-.container {
-    width: min(100% - 2rem, 72rem);
-    margin: 0 auto;
 }
 
 .main {
