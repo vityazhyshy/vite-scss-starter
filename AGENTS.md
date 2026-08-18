@@ -41,10 +41,12 @@ NEVER create folders or files for blocks/components/pages manually. ALWAYS sugge
 - Create a component (small UI): `npm run bem-c -- <component_name>`
 - Content images: store source images in `src/assets/images/` and reference/import them through Vite.
 - SVG sprites and favicons: use `npm run assets:*` commands (e.g., `npm run assets:sprites`, `npm run assets:favicons`).
+- Project metadata for HTML tokens, favicons, and PWA manifest lives in `project.config.mjs`.
 
 ## 6. 🚀 Build
 
 - To run a production build without file hashes, use `npm run build:no-hash`. This generates clean filenames (`main.min.js`, `vendor.min.js`, `main.min.css`).
+- Production builds automatically generate WebP variants for JPG/JPEG/PNG assets and rewrite final HTML image URLs to WebP.
 
 ## 7. ♻️ Reuse Strategy (CRITICAL)
 
@@ -76,6 +78,7 @@ NEVER create folders or files for blocks/components/pages manually. ALWAYS sugge
 
 - Store source images and assets only in the appropriate `src/assets/` directories.
 - Content images belong in `src/assets/images/`.
+- Built image assets must be emitted under `dist/assets/images/`; do not create per-extension folders such as `dist/assets/jpg` or `dist/assets/png`.
 - SVG icons for sprites belong in `src/assets/sprites/`.
 - The favicon source belongs in `src/assets/favicons/favicon.png`.
 - Never use files from `dist/` as source assets.

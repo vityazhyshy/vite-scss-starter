@@ -10,6 +10,7 @@
 - SCSS блоков подключается через агрегаторы
 - JS блоков подключается через `src/js/import`
 - контентные изображения обрабатываются Vite, а SVG-спрайт и favicon собираются отдельными командами
+- данные проекта для HTML, favicon и PWA manifest задаются в одном файле `project.config.mjs`
 
 ## 📌 Оглавление
 
@@ -40,6 +41,8 @@
 - HTML partials через `@@include(...)`
 - многостраничная сборка
 - автоматическое форматирование итоговых HTML при production build
+- автоматическая генерация WebP для JPG/JPEG/PNG во время production build
+- автоматическая замена ссылок на изображения в итоговых HTML на WebP
 - генерация SVG-спрайта
 - оптимизация изображений
 - генерация favicon
@@ -144,6 +147,7 @@ vite-scss-starter
 ├── eslint.config.mjs
 ├── postcss.config.js
 ├── package.json
+├── project.config.mjs
 └── vite.config.mjs
 ```
 
@@ -154,6 +158,7 @@ vite-scss-starter
 - **Контентные изображения** кладем в `src/assets/images/` и подключаем через Vite.
 - **SVG для спрайта** кладем в `src/assets/sprites/`.
 - **Исходник favicon** кладем в `src/assets/favicons/favicon.png`.
+- **Данные проекта** меняем в `project.config.mjs`: название, описание, язык, theme color и background color.
 
 ## 📖 Словарь терминов сборки
 
@@ -260,8 +265,9 @@ src/js/import/modules.js
 - `npm run format` — форматировать проект через Prettier
 - `npm run format:check` — проверить форматирование
 - `npm run test` — запустить smoke-тесты
-- `npm run build:check` — прогнать полную проверку перед релизом: format + lint + test + build
+- `npm run build:check` — прогнать полную проверку перед релизом: format + lint + test + build + verify
 - `npm run build:report` — собрать проект и показать отчет по размерам итоговых файлов в `dist`
+- `npm run verify:build` — проверить структуру `dist`, WebP-ссылки в HTML и PWA manifest
 
 ## 📄 Как создавать новую страницу
 
@@ -425,7 +431,27 @@ src/assets/images
 }
 ```
 
-Во время build Vite сам добавит такие файлы в граф сборки, положит их в `dist/assets` и перепишет ссылки на итоговые файлы с хэшами.
+Во время build Vite сам добавит такие файлы в граф сборки, положит изображения в:
+
+```text
+dist/assets/images
+```
+
+JPG, JPEG и PNG автоматически получают WebP-версию. В итоговых HTML сборщик заменяет ссылки на WebP:
+
+```html
+<!-- src -->
+<img src="/src/assets/images/photo.jpg" alt="Описание изображения" />
+
+<!-- dist -->
+<img src="/assets/images/photo-[hash].webp" alt="Описание изображения" />
+```
+
+Это работает для `src`, `srcset`, `href` и `data-*` атрибутов, если там указан путь к JPG/JPEG/PNG. Например, ссылки Fancybox на полноразмерные изображения тоже будут переписаны на WebP.
+
+Исходные JPG/PNG не удаляются из сборки автоматически. Это безопаснее: если картинка используется в CSS, она продолжит работать.
+
+В обычной сборке имена файлов получают хэш. В `build:no-hash` для изображений сохраняются относительные подпапки от `src/assets/images`, чтобы одинаковые имена из разных папок не конфликтовали.
 
 ### 🎯 SVG-спрайты
 
@@ -476,6 +502,21 @@ src/assets/favicons/favicon.png
 ```bash
 npm run assets:favicons
 ```
+
+Данные для favicon и PWA manifest берутся из:
+
+```text
+project.config.mjs
+```
+
+Перед стартом нового проекта укажите там:
+
+- `appName`
+- `appShortName`
+- `appDescription`
+- `lang`
+- `themeColor`
+- `backgroundColor`
 
 Результат:
 

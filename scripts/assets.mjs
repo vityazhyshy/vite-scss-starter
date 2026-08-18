@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import fg from "fast-glob";
+import { projectConfig } from "../project.config.mjs";
 
 const rootDir = fileURLToPath(new URL("..", import.meta.url));
 const srcAssetsDir = path.join(rootDir, "src", "assets");
@@ -107,12 +108,13 @@ export async function generateFavicons() {
     }
 
     const response = await favicons(faviconSource, {
-        appName: "Vite SCSS Starter",
-        appShortName: "Starter",
-        appDescription: "Modern multipage frontend starter",
-        background: "#ffffff",
-        theme_color: "#0f172a",
+        appName: projectConfig.appName,
+        appShortName: projectConfig.appShortName,
+        appDescription: projectConfig.appDescription,
+        background: projectConfig.backgroundColor,
+        theme_color: projectConfig.themeColor,
         path: "/img/favicons/",
+        start_url: projectConfig.startUrl,
         display: "standalone",
         orientation: "portrait",
         icons: {
@@ -132,7 +134,8 @@ export async function generateFavicons() {
     }
 
     for (const file of response.files) {
-        await writeFileEnsured(path.join(outDir, file.name), file.contents);
+        const contents = normalizeManifestFile(file);
+        await writeFileEnsured(path.join(outDir, file.name), contents);
     }
 
     await writeFileEnsured(path.join(outDir, "meta.html"), response.html.join("\n"));
@@ -141,6 +144,34 @@ export async function generateFavicons() {
         task: "favicons",
         count: response.images.length + response.files.length
     };
+}
+
+function normalizeManifestFile(file) {
+    if (!file.name.endsWith(".webmanifest") && !file.name.endsWith(".json")) {
+        return file.contents;
+    }
+
+    try {
+        const manifest = JSON.parse(file.contents.toString());
+
+        return `${JSON.stringify(
+            {
+                ...manifest,
+                name: projectConfig.appName,
+                short_name: projectConfig.appShortName,
+                description: projectConfig.appDescription,
+                lang: projectConfig.lang,
+                theme_color: projectConfig.themeColor,
+                background_color: projectConfig.backgroundColor,
+                start_url: projectConfig.startUrl,
+                icons: manifest.icons ?? []
+            },
+            null,
+            2
+        )}\n`;
+    } catch {
+        return file.contents;
+    }
 }
 
 export async function prepareAssets() {

@@ -4,7 +4,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import fg from "fast-glob";
 import * as prettier from "prettier";
+import { projectConfig } from "./project.config.mjs";
 import { prepareAssets } from "./scripts/assets.mjs";
+import { createAssetOutputPathResolver, webpAssetsPlugin } from "./scripts/vite-assets.mjs";
 
 const rootDir = fileURLToPath(new URL(".", import.meta.url));
 const partialsRoot = path.resolve(rootDir, "src");
@@ -81,7 +83,7 @@ function replaceTemplateTokens(source, context) {
     );
 }
 
-async function resolveHtmlIncludes(source, fromFile, context = {}) {
+async function resolveHtmlIncludes(source, fromFile, context = projectConfig) {
     const includePattern = /@@include\(\s*["'](.+?)["']\s*(?:,\s*({[\s\S]*?}))?\s*\)/g;
     let result = "";
     let lastIndex = 0;
@@ -93,6 +95,7 @@ async function resolveHtmlIncludes(source, fromFile, context = {}) {
         const rawContext = match[2];
         const nestedContext = rawContext ? JSON.parse(rawContext) : {};
         const mergedContext = {
+            ...projectConfig,
             ...context,
             ...nestedContext
         };
@@ -111,7 +114,10 @@ async function resolveHtmlIncludes(source, fromFile, context = {}) {
 
     result += source.slice(lastIndex);
 
-    return replaceTemplateTokens(result, context);
+    return replaceTemplateTokens(result, {
+        ...projectConfig,
+        ...context
+    });
 }
 
 function partialsPlugin() {
@@ -280,6 +286,10 @@ export default defineConfig(({ mode }) => ({
     plugins: [
         buildLockPlugin(),
         ...(mode === "test" ? [] : [assetPipelinePlugin()]),
+        webpAssetsPlugin({
+            rootDir,
+            noHash: process.env.NO_HASH === "true"
+        }),
         partialsPlugin(),
         flattenHtmlEntriesPlugin()
     ],
@@ -309,6 +319,7 @@ export default defineConfig(({ mode }) => ({
     build: {
         outDir: "dist",
         emptyOutDir: true,
+        assetsInlineLimit: 0,
         rollupOptions: {
             input: htmlEntries,
             output: {
@@ -320,19 +331,10 @@ export default defineConfig(({ mode }) => ({
                     const noHash = process.env.NO_HASH === "true";
                     return noHash ? "assets/js/[name].min.js" : "assets/js/[name]-[hash].min.js";
                 },
-                assetFileNames: (assetInfo) => {
-                    const noHash = process.env.NO_HASH === "true";
-                    const fileName = assetInfo.names?.[0] || assetInfo.name || "";
-                    const extType = fileName.split(".").pop();
-                    if (extType === "css") {
-                        return noHash
-                            ? "assets/styles/main.min.css"
-                            : "assets/styles/main-[hash].min.css";
-                    }
-                    return noHash
-                        ? `assets/${extType}/[name].[ext]`
-                        : `assets/${extType}/[name]-[hash].[ext]`;
-                },
+                assetFileNames: createAssetOutputPathResolver({
+                    rootDir,
+                    noHash: process.env.NO_HASH === "true"
+                }),
                 manualChunks(id) {
                     if (id.includes("node_modules")) {
                         return "vendor";
