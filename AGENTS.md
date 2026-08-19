@@ -6,7 +6,7 @@ Strictly adhere to the following rules:
 
 ## 1. 🏗 Architecture & File Structure
 
-- **ALL code MUST be written in the `src/` directory.** NEVER suggest editing or modify files in `dist/` or `public/img/`—they are generated/output directories.
+- **ALL code MUST be written in the `src/` directory.** NEVER suggest editing or modify files in `dist/` or `public/assets/`—they are generated/output directories.
 - **Pages** are located in `src/views/`. The entry point is `index.html`.
 - **Large blocks** (Headers, Footers, Sections) are located in `src/blocks/modules/`.
 - **Small UI components** (Buttons, Inputs, Icons) are located in `src/blocks/components/`.
@@ -81,6 +81,8 @@ NEVER create folders or files for blocks/components/pages manually. ALWAYS sugge
 - Built image assets must be emitted under `dist/assets/images/`; do not create per-extension folders such as `dist/assets/jpg` or `dist/assets/png`.
 - SVG icons for sprites belong in `src/assets/sprites/`.
 - The favicon source belongs in `src/assets/favicons/favicon.png`.
+- Generated sprites must be emitted under `dist/assets/sprites/`.
+- Generated favicons and PWA manifest must be emitted under `dist/assets/favicons/`.
 - Never use files from `dist/` as source assets.
 - Do not place new source images into auto-generated folders.
 - Use the project's asset commands only for sprites and favicons.

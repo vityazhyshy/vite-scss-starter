@@ -122,7 +122,7 @@ npm run build
 vite-scss-starter
 ├── dist
 ├── public
-│   └── img
+│   └── assets
 ├── scripts
 ├── src
 │   ├── blocks
@@ -154,7 +154,7 @@ vite-scss-starter
 ## 🛑 Где писать код? (Важно!)
 
 - **ВЕСЬ ваш код (HTML, CSS, JS) пишется ТОЛЬКО в папке `src/`.**
-- **НИКОГДА** не редактируйте файлы в папках `dist/` или `public/img/`. Папка `dist` перезаписывается при каждой сборке проекта, а `public/img` используется только для сгенерированных sprite/favicon файлов.
+- **НИКОГДА** не редактируйте файлы в папках `dist/` или `public/assets/`. Папка `dist` перезаписывается при каждой сборке проекта, а `public/assets` используется только для сгенерированных sprite/favicon файлов.
 - **Контентные изображения** кладем в `src/assets/images/` и подключаем через Vite.
 - **SVG для спрайта** кладем в `src/assets/sprites/`.
 - **Исходник favicon** кладем в `src/assets/favicons/favicon.png`.
@@ -470,14 +470,15 @@ npm run assets:sprites
 Результат:
 
 ```text
-public/img/sprites/sprite.svg
+public/assets/sprites/sprite.svg
+dist/assets/sprites/sprite.svg
 ```
 
 Использование в HTML:
 
 ```html
 <svg>
-    <use xlink:href="/img/sprites/sprite.svg#icon-name"></use>
+    <use xlink:href="/assets/sprites/sprite.svg#icon-name"></use>
 </svg>
 ```
 
@@ -521,7 +522,8 @@ project.config.mjs
 Результат:
 
 ```text
-public/img/favicons
+public/assets/favicons
+dist/assets/favicons
 ```
 
 ## 🔠 Шрифты

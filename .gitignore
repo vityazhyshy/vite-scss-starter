@@ -13,4 +13,5 @@ _config.yml
 node_modules
 dist
 .vite
+public/assets
 public/img

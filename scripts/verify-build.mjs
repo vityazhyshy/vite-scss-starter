@@ -71,10 +71,14 @@ function stripQueryAndHash(url) {
 
 function isPublicFaviconUrl(url) {
     const pathname = stripQueryAndHash(url);
-    return pathname.startsWith("/img/favicons/") || pathname.startsWith("img/favicons/");
+    return pathname.startsWith("/assets/favicons/") || pathname.startsWith("assets/favicons/");
 }
 
 async function verifyForbiddenImageDirs() {
+    if (await pathExists(path.join(distDir, "img"))) {
+        fail("legacy directory exists: dist/img");
+    }
+
     for (const dirName of forbiddenImageDirs) {
         const dirPath = path.join(distDir, "assets", dirName);
 
@@ -93,8 +97,14 @@ async function verifyImagesDirectory() {
     for (const filePath of assetFiles) {
         const extType = getExtension(filePath);
 
-        if (imageExtensions.has(extType) && !normalizePath(filePath).startsWith("assets/images/")) {
-            fail(`image asset is outside dist/assets/images: ${filePath}`);
+        const normalizedFilePath = normalizePath(filePath);
+        const isAllowedAssetPath =
+            normalizedFilePath.startsWith("assets/images/") ||
+            normalizedFilePath.startsWith("assets/favicons/") ||
+            normalizedFilePath.startsWith("assets/sprites/");
+
+        if (imageExtensions.has(extType) && !isAllowedAssetPath) {
+            fail(`image asset is outside allowed dist/assets directories: ${filePath}`);
         }
     }
 }
@@ -135,13 +145,13 @@ async function verifyHtmlImageUrls() {
 
 async function verifyManifest() {
     const manifestFiles = await fg("**/*.{webmanifest,json}", {
-        cwd: path.join(distDir, "img", "favicons"),
+        cwd: path.join(distDir, "assets", "favicons"),
         onlyFiles: true
     }).catch(() => []);
 
     for (const filePath of manifestFiles) {
         const manifest = JSON.parse(
-            await fs.readFile(path.join(distDir, "img", "favicons", filePath), "utf8")
+            await fs.readFile(path.join(distDir, "assets", "favicons", filePath), "utf8")
         );
         const serialized = JSON.stringify(manifest);
 

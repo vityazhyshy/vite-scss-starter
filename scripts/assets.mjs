@@ -9,7 +9,8 @@ import { projectConfig } from "../project.config.mjs";
 const rootDir = fileURLToPath(new URL("..", import.meta.url));
 const srcAssetsDir = path.join(rootDir, "src", "assets");
 const publicDir = path.join(rootDir, "public");
-const publicImgDir = path.join(publicDir, "img");
+const publicAssetsDir = path.join(publicDir, "assets");
+const legacyPublicImgDir = path.join(publicDir, "img");
 const faviconSource = path.join(srcAssetsDir, "favicons", "favicon.png");
 const spriteSourceDir = path.join(srcAssetsDir, "sprites");
 
@@ -27,6 +28,10 @@ async function writeFileEnsured(targetPath, contents) {
     await fs.writeFile(targetPath, contents);
 }
 
+async function removeLegacyPublicImg() {
+    await fs.rm(legacyPublicImgDir, { recursive: true, force: true });
+}
+
 export async function buildSprites() {
     const { default: SVGSpriter } = await import("svg-sprite");
     const files = await fg("**/*.svg", {
@@ -35,7 +40,8 @@ export async function buildSprites() {
         onlyFiles: true
     });
 
-    const outDir = path.join(publicImgDir, "sprites");
+    const outDir = path.join(publicAssetsDir, "sprites");
+    await removeLegacyPublicImg();
     await emptyDir(outDir);
 
     if (files.length === 0) {
@@ -98,7 +104,8 @@ export async function buildSprites() {
 
 export async function generateFavicons() {
     const { favicons } = await import("favicons");
-    const outDir = path.join(publicImgDir, "favicons");
+    const outDir = path.join(publicAssetsDir, "favicons");
+    await removeLegacyPublicImg();
     await emptyDir(outDir);
 
     try {
@@ -113,7 +120,7 @@ export async function generateFavicons() {
         appDescription: projectConfig.appDescription,
         background: projectConfig.backgroundColor,
         theme_color: projectConfig.themeColor,
-        path: "/img/favicons/",
+        path: "/assets/favicons/",
         start_url: projectConfig.startUrl,
         display: "standalone",
         orientation: "portrait",
@@ -178,7 +185,8 @@ export async function prepareAssets() {
     const commands = ["sprites", "favicons"];
     const results = [];
 
-    await emptyDir(publicImgDir);
+    await removeLegacyPublicImg();
+    await emptyDir(publicAssetsDir);
 
     for (const command of commands) {
         results.push(await runSubcommand(command));

@@ -137,7 +137,7 @@ function isExternalOrSpecialUrl(url) {
 }
 
 function isFaviconOrPwaIconUrl(pathname) {
-    return pathname.startsWith("/img/favicons/") || pathname.startsWith("img/favicons/");
+    return pathname.startsWith("/assets/favicons/") || pathname.startsWith("assets/favicons/");
 }
 
 function getSourceImagePath(urlPathname, rootDir) {

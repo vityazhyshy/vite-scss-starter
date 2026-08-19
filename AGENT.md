@@ -6,7 +6,7 @@ Strictly adhere to the following rules:
 
 ## 1. 🏗 Architecture & File Structure
 
-- **ALL code MUST be written in the `src/` directory.** NEVER suggest editing or modify files in `dist/` or `public/img/`—they are auto-generated.
+- **ALL code MUST be written in the `src/` directory.** NEVER suggest editing or modify files in `dist/` or `public/assets/`—they are generated/output directories.
 - **Pages** are located in `src/views/`. The entry point is `index.html`.
 - **Large blocks** (Headers, Footers, Sections) are located in `src/blocks/modules/`.
 - **Small UI components** (Buttons, Inputs, Icons) are located in `src/blocks/components/`.
@@ -39,11 +39,14 @@ NEVER create folders or files for blocks/components/pages manually. ALWAYS sugge
 - Create a new page: `npm run new:page -- <page_name>`
 - Create a module (large block) and include it in a page: `npm run block -- --type=module --page=<page_name> <block_name>`
 - Create a component (small UI): `npm run bem-c -- <component_name>`
-- Image optimization & sprites: Use `npm run assets:*` commands (e.g., `npm run assets:sprites`).
+- Content images: store source images in `src/assets/images/` and reference/import them through Vite.
+- SVG sprites and favicons: use `npm run assets:*` commands (e.g., `npm run assets:sprites`, `npm run assets:favicons`).
+- Project metadata for HTML tokens, favicons, and PWA manifest lives in `project.config.mjs`.
 
 ## 6. 🚀 Build
 
 - To run a production build without file hashes, use `npm run build:no-hash`. This generates clean filenames (`main.min.js`, `vendor.min.js`, `main.min.css`).
+- Production builds automatically generate WebP variants for JPG/JPEG/PNG assets and rewrite final HTML image URLs to WebP.
 
 ## 7. ♻️ Reuse Strategy (CRITICAL)
 
@@ -73,10 +76,16 @@ NEVER create folders or files for blocks/components/pages manually. ALWAYS sugge
 
 ## 10. Images & Assets
 
-- Store source images and assets only in the appropriate `src/` assets directories.
+- Store source images and assets only in the appropriate `src/assets/` directories.
+- Content images belong in `src/assets/images/`.
+- Built image assets must be emitted under `dist/assets/images/`; do not create per-extension folders such as `dist/assets/jpg` or `dist/assets/png`.
+- SVG icons for sprites belong in `src/assets/sprites/`.
+- The favicon source belongs in `src/assets/favicons/favicon.png`.
+- Generated sprites must be emitted under `dist/assets/sprites/`.
+- Generated favicons and PWA manifest must be emitted under `dist/assets/favicons/`.
 - Never use files from `dist/` as source assets.
 - Do not place new source images into auto-generated folders.
-- Use the project's asset optimization commands when needed.
+- Use the project's asset commands only for sprites and favicons.
 
 ## 11. Naming Conventions
 
